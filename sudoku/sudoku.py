@@ -22,14 +22,14 @@ class SudokuBoard:
         Args:
             board (list[list[int]]): A 9x9 2D list representing the initial Sudoku board.
         """
-        self.initialBoard = board
-        self.solvedBoard = deepcopy(board)  # Deep copy to avoid modifying original board
+        self.initial_board = board
+        self.solved_board = deepcopy(board)  # Deep copy to avoid modifying original board
 
-    def solveSudoku(self):
+    def solve_sudoku(self):
         """
         Solves the Sudoku board in place using backtracking.
         """
-        self.solve(self.solvedBoard)
+        self.solve(self.solved_board)
 
     def solve(self, board, i=0, j=0):
         """
@@ -43,7 +43,7 @@ class SudokuBoard:
         Returns:
             bool: True if a solution is found, False otherwise.
         """
-        def findNextCellToFill(board):
+        def find_next_blank_Cell(board):
             for x in range(0, 9):
                 for y in range(0, 9):
                     if board[x][y] == 0:
@@ -51,14 +51,14 @@ class SudokuBoard:
 
             return -1, -1
         
-        def isValid(board, i, j, e):
-            rowOk = all([e != board[i][x] for x in range(9)])
-            if not rowOk:
-                return False
-
-            columnOk = all([e != board[x][j] for x in range(9)])
-            if not columnOk:
-                return False
+        def is_valid_num(board, i, j, e):
+            for x in range(9):
+                if board[i][x] == e:
+                    return False
+            
+            for x in range(9):
+                if board[x][j] == e:
+                    return False
 
             # Gets the top left coordinates of the section containing the i,j cell
             squareTopX, squareTopY = 3 * (i//3), 3 * (j//3)
@@ -69,12 +69,12 @@ class SudokuBoard:
 
             return True
         
-        i, j = findNextCellToFill(board)
+        i, j = find_next_blank_Cell(board)
         if i == -1:
             return True
 
         for e in range(1, 10):
-            if isValid(board, i, j, e):
+            if is_valid_num(board, i, j, e):
                 board[i][j] = e
                 if self.solve(board, i, j):
                     return True  # Solution found
@@ -90,10 +90,10 @@ class SudokuBoard:
             str: The color-coded string representation of the solved board.
         """
         board_str = ""
-        for i, row in enumerate(self.solvedBoard):
+        for i, row in enumerate(self.solved_board):
             line = ""
             for j, num in enumerate(row):
-                if self.initialBoard[i][j] == 0:
+                if self.initial_board[i][j] == 0:
                     line += f"{Fore.GREEN}{num}{Fore.RESET} "
                 else:
                     line += f"{num} "
@@ -101,17 +101,17 @@ class SudokuBoard:
         return board_str.strip()
     
     
-def playSudoku():
+def play_sudoku():
     print("Enter the sudoku board one line at a time")
     
     board = []
     for _ in range(9):
         board.append([int(char) for char in input()])
     
-    autoSudoku(board)
+    auto_sudoku(board)
 
 
-def autoSudoku(board):
+def auto_sudoku(board):
     s = SudokuBoard(board)
-    s.solveSudoku()
+    s.solve_sudoku()
     print(s)

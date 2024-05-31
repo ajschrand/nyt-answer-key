@@ -12,29 +12,29 @@ Key Features:
 
 Dependencies:
 
-* utils.py: Contains helper functions `wordHasOnlyLetters` and `getAllEnglishWords`.
+* utils.py: Contains helper functions.
 """
 
-from utils import wordHasOnlyLetters
-from utils import getAllEnglishWords
-from utils import wordContainsAllLetters
+from utils import word_has_only
+from utils import get_english_words
+from utils import word_has_all
 
-def playSpellingBee():
+def play_spelling_bee():
     """
     Starts the Spelling Bee game.
 
     Prompts the user for letters and the yellow letter.
     """
     print("Enter the letters")
-    lettersList = input()
+    letters_list = input()
     
     print("Enter the yellow letter")
-    yellowLetter = input()
+    center_letter = input()
     
-    autoSpellingBee(yellowLetter, lettersList)
+    auto_spelling_bee(center_letter, letters_list)
     
 
-def autoSpellingBee(yellowLetter, lettersList):
+def auto_spelling_bee(center_letter, letters_list):
     """
     Finds valid words for the Spelling Bee game.
     Prints valid words sorted by length.
@@ -44,7 +44,7 @@ def autoSpellingBee(yellowLetter, lettersList):
         lettersList: The list of allowed letters.
     """
     
-    def getPointValueForWord(word):
+    def get_points(word):
         """
         Gets the point value for valid words for the Spelling Bee game.
         
@@ -62,21 +62,21 @@ def autoSpellingBee(yellowLetter, lettersList):
         if len(word) == 4:
             return 1
         
-        bonus = 7 if wordContainsAllLetters(word, lettersList) else 0
+        bonus = 7 if word_has_all(word, letters_list) else 0
         return len(word) + bonus
         
     answers = []
-    for word in getAllEnglishWords():
+    for word in get_english_words():
         if len(word) < 4:
             continue
 
-        if yellowLetter not in word:
+        if center_letter not in word:
             continue
 
-        if not wordHasOnlyLetters(word, lettersList):
+        if not word_has_only(word, letters_list):
             continue
 
         answers.append(word)
 
-    answers.sort(key=getPointValueForWord, reverse=True)
+    answers.sort(key=get_points, reverse=True)
     print(answers)

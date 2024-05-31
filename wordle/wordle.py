@@ -3,7 +3,7 @@ import wordfreq as wf
 import json
 
 from statistics import median
-from utils import wordContainsDuplicateLetters
+from utils import word_has_duplicates
 from collections import defaultdict
 from pathlib import Path
 cwd = Path(__file__).resolve().parent
@@ -11,7 +11,7 @@ cwd = Path(__file__).resolve().parent
 DEFAULT_STARTING_GUESS = "crate"
 
 VALID_WORDLE_ANSWERS = []
-with open(f"{cwd}\\wordle-answers-alphabetical.txt", 'r') as f:
+with open(f"{cwd}\\wordle_answers_alphabetical.txt", 'r') as f:
     for line in f:
         VALID_WORDLE_ANSWERS.append(line.strip())
 
@@ -19,42 +19,42 @@ with open(f"{cwd}\\wordle-answers-alphabetical.txt", 'r') as f:
 # If the letter frequencies have already been calculated, load them from the file
 # Otherwise, calculate them and save them to the file
 LETTER_FREQUENCIES_ANSWERS = None
-if os.path.exists(f"{cwd}\\letterFrequencies.txt"):
-    LETTER_FREQUENCIES_ANSWERS = json.load(open(f"{cwd}\\letterFrequencies.txt", 'r'))
+if os.path.exists(f"{cwd}\\letter_frequencies.txt"):
+    LETTER_FREQUENCIES_ANSWERS = json.load(open(f"{cwd}\\letter_frequencies.txt", 'r'))
 else:
     LETTER_FREQUENCIES_ANSWERS = defaultdict(lambda: defaultdict(int))
     for answer in VALID_WORDLE_ANSWERS:
         for i, letter in enumerate(answer):
             LETTER_FREQUENCIES_ANSWERS[str(i)][letter] += 1
 
-    json.dump(LETTER_FREQUENCIES_ANSWERS, open(f"{cwd}\\letterFrequencies.txt", 'w'))
+    json.dump(LETTER_FREQUENCIES_ANSWERS, open(f"{cwd}\\letter_frequencies.txt", 'w'))
 
 
 # Play Wordle manually
 # Enter guesses followed by their info strings
 # Enter "q" to quit
 # Enter "r" to restart
-def playWordle():
+def play_wordle():
     print("Welcome to Wordle Solver!")
     print("Enter your guess followed by its info string.")
 
-    guessString = input("Guess: ")
-    guessInfo = {}
-    while guessString != "q":
-        guess, info = guessString.split()
-        infoList = [int(info[i]) for i in range(5)]
-        guessInfo[guess] = infoList
+    guess_str = input("Guess: ")
+    guess_info = {}
+    while guess_str != "q":
+        guess, info = guess_str.split()
+        info_list = [int(info[i]) for i in range(5)]
+        guess_info[guess] = info_list
 
-        possibleSolutions = generateWordleGuesses(guessInfo)
-        if len(possibleSolutions) == 1:
-            print(f"Solution: {possibleSolutions[0]}")
+        solutions = generate_guesses(guess_info)
+        if len(solutions) == 1:
+            print(f"Solution: {solutions[0]}")
             break
         
-        print(generateWordleGuesses(guessInfo)[:5])
+        print(generate_guesses(guess_info)[:5])
 
-        guessString = input("Guess: ")
-        if guessString == "r":
-            playWordle()
+        guess_str = input("Guess: ")
+        if guess_str == "r":
+            play_wordle()
             return
 
 
@@ -62,147 +62,145 @@ def playWordle():
 # If printGuesses is True, print each guess as it is made
 # Return the number of guesses required to solve the word
 # If the word is not solved after 6 guesses, return 6
-def autoWordle(wordToGuess, startingGuess=DEFAULT_STARTING_GUESS, printGuesses=False):
-    guessInfo = {}
-    numGuesses = 0
-    optimizedRemainingWords = []
+def auto_wordle(wordle, start_guess=DEFAULT_STARTING_GUESS, print_guesses=False):
+    guess_info = {}
+    num_guesses = 0
+    words = []
     while True:
-        if numGuesses <= 1:
-            optimizedRemainingWords = generateWordleGuesses(
-                guessInfo, startingGuess=startingGuess)
+        if num_guesses <= 1:
+            words = generate_guesses(guess_info, start_guess=start_guess)
         else:
-            optimizedRemainingWords = generateWordleGuesses(
-                guessInfo, startingGuess=startingGuess, remainingWords=optimizedRemainingWords)
+            words = generate_guesses(guess_info, start_guess=start_guess, words=words)
 
-        guess = optimizedRemainingWords[0]
-        numGuesses += 1
+        guess = words[0]
+        num_guesses += 1
 
-        if printGuesses:
+        if print_guesses:
             print(guess)
 
-        info = giveWordleClues(wordToGuess, guess)
-        guessInfo[guess] = info
+        info = give_clues(wordle, guess)
+        guess_info[guess] = info
 
-        if guess == wordToGuess or numGuesses == 6:
-            if printGuesses:
-                print(generateEmojiGuessSummary(guessInfo))
+        if guess == wordle or num_guesses == 6:
+            if print_guesses:
+                print(get_emoji_summary(guess_info))
                 
-            return numGuesses
+            return num_guesses
 
 
 # Generate a Wordle guess based on the information gathered from previous guesses
 # Find all possible words that match the information gathered so far
 # Optimize the choice of word based on the information gathered so far and the current amount of information
 # Return the first word in the optimized list of possible words
-def generateWordleGuesses(guessInfo, startingGuess=DEFAULT_STARTING_GUESS, remainingWords=VALID_WORDLE_ANSWERS):
-    if len(guessInfo) == 0:
-        return [startingGuess]
+def generate_guesses(guess_info, start_guess=DEFAULT_STARTING_GUESS, words=VALID_WORDLE_ANSWERS):
+    if len(guess_info) == 0:
+        return [start_guess]
 
-    latestGuess = list(guessInfo.keys())[-1]
-    numLettersFound = sum([1 for num in guessInfo[latestGuess] if num != 0])
+    last_guess = list(guess_info.keys())[-1]
+    letters_known = sum([1 for num in guess_info[last_guess] if num != 0])
 
-    words = findPossibleWords(guessInfo, remainingWords=remainingWords)
-    words = optimizeWordChoice(words, numLettersFound)
+    guesses = find_possible_words(guess_info, words=words)
+    guesses = optimize_words(guesses, letters_known)
 
-    return words
+    return guesses
 
 
 # Find all possible words that match the information gathered so far
-def findPossibleWords(guessInfo, remainingWords=VALID_WORDLE_ANSWERS):
+def find_possible_words(guess_info, words=VALID_WORDLE_ANSWERS):
     # Helper functions for findPossibleWords
     # Check if the correct letters in a word match the correct letters in the guess
-    def doCorrectLettersMatch(word, correctLetters):
+    def do_greens_match(word, greens):
         for i in range(5):
-            if correctLetters[i] == '_':
+            if greens[i] == '_':
                 continue
 
-            if word[i] != correctLetters[i]:
+            if word[i] != greens[i]:
                 return False
         return True
 
     # Helper functions for findPossibleWords
     # Check if the incorrect letters in a word match the incorrect letters in the guess
-    def doIncorrectLettersMatch(word, incorrectLetters):
-        for i, lettersList in enumerate(incorrectLetters):
-            for letter in lettersList:
+    def do_blacks_match(word, blacks):
+        for i, letters_list in enumerate(blacks):
+            for letter in letters_list:
                 if letter == word[i]:
                     return False
         return True
 
     # Helper functions for findPossibleWords
     # Check if the possible correct letter positions in a word match the possible correct letter positions in the guess
-    def doPossibleCorrectLetterPositionsMatch(word, possibleCorrectLetterPositions):
-        for letter in possibleCorrectLetterPositions:
-            if word.find(letter) not in possibleCorrectLetterPositions[letter]:
+    def do_yellows_match(word, yellows):
+        for letter in yellows:
+            if word.find(letter) not in yellows[letter]:
                 return False
         return True
 
-    correctLetters = ["_"] * 5
-    for guess in guessInfo:
-        for i, info in enumerate(guessInfo[guess]):
+    greens = ["_"] * 5
+    for guess in guess_info:
+        for i, info in enumerate(guess_info[guess]):
             if info == 2:
-                correctLetters[i] = guess[i]
+                greens[i] = guess[i]
 
-    incorrectLetters = ["_"] * 5
-    possibleCorrectLetterPositions = {}
-    for guess in guessInfo:
-        for i, info in enumerate(guessInfo[guess]):
+    blacks = ["_"] * 5
+    yellows_positions = {}
+    for guess in guess_info:
+        for i, info in enumerate(guess_info[guess]):
             if info == 0:
                 for j in range(5):
-                    if guess[i] != correctLetters[j]:
-                        incorrectLetters[j] += guess[i]
+                    if guess[i] != greens[j]:
+                        blacks[j] += guess[i]
             elif info == 1:
-                incorrectLetters[i] += guess[i]
-                possibleIndexes = [j for j in range(5) if guess[i] not in incorrectLetters[j]]
-                possibleCorrectLetterPositions[guess[i]] = possibleIndexes
+                blacks[i] += guess[i]
+                possible_position = [j for j in range(5) if guess[i] not in blacks[j]]
+                yellows_positions[guess[i]] = possible_position
 
-    possibleWords = []
-    for word in remainingWords:
-        if not doCorrectLettersMatch(word, correctLetters):
+    possible_words = []
+    for word in words:
+        if not do_greens_match(word, greens):
             continue
 
-        if not doIncorrectLettersMatch(word, incorrectLetters):
+        if not do_blacks_match(word, blacks):
             continue
 
-        if not doPossibleCorrectLetterPositionsMatch(word, possibleCorrectLetterPositions):
+        if not do_yellows_match(word, yellows_positions):
             continue
 
-        possibleWords.append(word)
+        possible_words.append(word)
 
-    return possibleWords
+    return possible_words
 
 
 # Optimize the choice of word based on the information gathered so far and the current amount of information
 # If the latest guess does not have much information, prioritize words with high letter frequencies
 # If the latest guess has a lot of information, prioritize words with high word frequencies
-def optimizeWordChoice(words, numLettersFound):
+def optimize_words(words, letters_known):
     optimized = []
-    if numLettersFound < 3:
-        optimized = sorted(words, key=assignLetterFrequencyScore, reverse=True)
+    if letters_known < 3:
+        optimized = sorted(words, key=get_letter_freq, reverse=True)
     else:
-        optimized = sorted(words, key=assignWordFrequencyScore, reverse=True)
+        optimized = sorted(words, key=get_word_freq, reverse=True)
 
     return optimized
 
 
 # Assign a score to a word based on the frequency of its letters
 # Used as a comparison function for sorting guesses
-def assignLetterFrequencyScore(word):
-    letterFrequencies = []
+def get_letter_freq(word):
+    letter_frequencies = []
     for i, letter in enumerate(word):
-        letterFrequencies.append(LETTER_FREQUENCIES_ANSWERS[str(i)][letter])
+        letter_frequencies.append(LETTER_FREQUENCIES_ANSWERS[str(i)][letter])
         
-    wordScore = median(letterFrequencies)
+    score = median(letter_frequencies)
 
-    if wordContainsDuplicateLetters(word):
-        wordScore *= 0.5
+    if word_has_duplicates(word):
+        score *= 0.5
 
-    return wordScore
+    return score
 
 
 # Assign a score to a word based on the frequency of the word itself
 # Used as a comparison function for sorting guesses
-def assignWordFrequencyScore(word):
+def get_word_freq(word):
     return wf.word_frequency(word, 'en')
 
 
@@ -210,32 +208,32 @@ def assignWordFrequencyScore(word):
 # The info list contains 0s, 1s, and 2s, where 0 indicates that the letter is not in the word to guess,
 # 1 indicates that the letter is in the word to guess but not in the correct position, and 2 indicates
 # that the letter is in the correct position
-def giveWordleClues(wordToGuess, guess):
-    wordList = list(wordToGuess)
-    infoList = [0] * 5
+def give_clues(wordle, guess):
+    word_list = list(wordle)
+    info_list = [0] * 5
     
     for i in range(5):
-        if guess[i] == wordList[i]:
-            infoList[i] = 2
-            wordList[i] = "_"
+        if guess[i] == word_list[i]:
+            info_list[i] = 2
+            word_list[i] = "_"
 
     for i in range(5):
-        if infoList[i] == 2:
+        if info_list[i] == 2:
             continue
 
-        if guess[i] in wordList:
-            infoList[i] = 1
+        if guess[i] in word_list:
+            info_list[i] = 1
 
-    return infoList
+    return info_list
 
 
-def generateEmojiGuessSummary(guessInfo):
-    guessInfoToEmoji = {0: "⬛", 1: "🟨", 2: "🟩"}
+def get_emoji_summary(guess_info):
+    info_to_emoji = {0: "⬛", 1: "🟨", 2: "🟩"}
     
     summary = ""
-    for guess in guessInfo:
-        for num in guessInfo[guess]:
-            summary += guessInfoToEmoji[num]
+    for guess in guess_info:
+        for info in guess_info[guess]:
+            summary += info_to_emoji[info]
             
         summary += "\n"
             
