@@ -17,6 +17,7 @@ Dependencies:
 
 from utils import wordHasOnlyLetters
 from utils import getAllEnglishWords
+from utils import wordContainsAllLetters
 
 def playSpellingBee():
     """
@@ -42,6 +43,28 @@ def autoSpellingBee(yellowLetter, lettersList):
         yellowLetter: The mandatory letter that must be in each word.
         lettersList: The list of allowed letters.
     """
+    
+    def getPointValueForWord(word):
+        """
+        Gets the point value for valid words for the Spelling Bee game.
+        
+        4-letter words are worth 1 point each.
+        Longer words earn 1 point per letter.
+        Each puzzle includes at least one “pangram” which uses every letter.
+        Pangrams are worth 1 point per letter plus 7 extra points.
+
+        Args:
+            word: The word to get the point value for
+            
+        Returns:
+            The point value of the given word
+        """
+        if len(word) == 4:
+            return 1
+        
+        bonus = 7 if wordContainsAllLetters(word, lettersList) else 0
+        return len(word) + bonus
+        
     answers = []
     for word in getAllEnglishWords():
         if len(word) < 4:
@@ -55,5 +78,5 @@ def autoSpellingBee(yellowLetter, lettersList):
 
         answers.append(word)
 
-    answers.sort(key=len, reverse=True)
+    answers.sort(key=getPointValueForWord, reverse=True)
     print(answers)
