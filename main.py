@@ -9,12 +9,11 @@ def spelling_bee():
     print("2 - NYT")
 
     menu_input = get_menu_input(2)
-    match menu_input:
-        case 1:
-            spelling_bee.play_spelling_bee()
-        case 2:
-            center_letter, letters_list = request_NYT_data("spelling bee")
-            spelling_bee.auto_spelling_bee(center_letter, letters_list)
+    if menu_input == 1:
+        spelling_bee.play_spelling_bee()
+    elif menu_input == 2:
+        center_letter, letters_list = request_NYT_data("spelling bee")
+        spelling_bee.auto_spelling_bee(center_letter, letters_list)
 
 
 def wordle():
@@ -25,26 +24,24 @@ def wordle():
     print("2 - Automatic")
 
     menu_input = get_menu_input(2)
-    match menu_input:
-        case 1:
-            wordle.play_wordle()
-        case 2:
-            print("Solve custom word or current NYT word?")
-            print("1 - Custom")
-            print("2 - NYT")
+    if menu_input == 1:
+        wordle.play_wordle()
+    elif menu_input == 2:
+        print("Solve custom word or current NYT word?")
+        print("1 - Custom")
+        print("2 - NYT")
 
-            menu_input = get_menu_input(2)
-            word = ""
-            match menu_input:
-                case 1:
-                    print("Enter the word to guess")
-                    word = input()
-                case 2:
-                    # TODO get today's wordle word
-                    pass
+        menu_input = get_menu_input(2)
+        word = ""
+        if menu_input == 1:
+            print("Enter the word to guess")
+            word = input()
+        elif menu_input == 2:
+            # TODO get today's wordle word
+            pass
 
-            print("")
-            wordle.auto_wordle(word, print_guesses=True)
+        print("")
+        wordle.auto_wordle(word, print_guesses=True)
 
 
 def connections():
@@ -54,21 +51,39 @@ def connections():
     print("1 - Manual")
     print("2 - Automatic")
 
-    menu_input = get_menu_input(2)
-    match menu_input:
-        case 1:
+    game_type = get_menu_input(2)
+
+    print("Solve custom puzzle or current NYT puzzle?")
+    print("1 - Custom")
+    print("2 - NYT")
+
+    puzzle_source = get_menu_input(2)
+
+    if puzzle_source == 1:
+        if game_type == 1:
             connections.play_connections()
-        case 2:
+        elif game_type == 2:
             print(
                 "Enter 4 solution groups as lists of words separated by spaces, each on its own line")
-            solution = []
+            solutions = []
             for _ in range(4):
-                solution.append(input().split())
+                solutions.append(input().split())
 
             print("")
-            connections.auto_connections(solution)
+            connections.auto_connections(solutions)
+    elif puzzle_source == 2:
+        solutions = request_NYT_data("connections")
 
-    # TODO get today's connections board
+        if game_type == 1:
+            from random import shuffle
+
+            word_list = [word for solution in solutions for word in solution]
+            shuffle(word_list)
+
+            print(f"Board: {" ".join(word_list)}")
+            connections.play_connections()
+        elif game_type == 2:
+            connections.auto_connections(solutions)
 
 
 def crossword():
@@ -87,35 +102,33 @@ def sudoku():
     print("2 - NYT")
 
     menu_input = get_menu_input(2)
-    match menu_input:
-        case 1:
-            sudoku.play_sudoku()
-        case 2:
-            print("Solve easy, medium, or hard puzzle?")
-            print("1 - Easy")
-            print("2 - Medium")
-            print("3 - Hard")
+    if menu_input == 1:
+        sudoku.play_sudoku()
+    elif menu_input == 2:
+        print("Solve easy, medium, or hard puzzle?")
+        print("1 - Easy")
+        print("2 - Medium")
+        print("3 - Hard")
 
-            menu_input = get_menu_input(3)
-            one_D_board = []
-            match menu_input:
-                case 1:
-                    one_D_board = request_NYT_data("sudoku easy")
-                case 2:
-                    one_D_board = request_NYT_data("sudoku medium")
-                case 3:
-                    one_D_board = request_NYT_data("sudoku hard")
+        menu_input = get_menu_input(3)
+        one_D_board = []
+        if menu_input == 1:
+            one_D_board = request_NYT_data("sudoku easy")
+        elif menu_input == 2:
+            one_D_board = request_NYT_data("sudoku medium")
+        elif menu_input == 3:
+            one_D_board = request_NYT_data("sudoku hard")
 
-            two_D_board = []
-            row = []
-            for i, num in enumerate(one_D_board):
-                row.append(num)
+        two_D_board = []
+        row = []
+        for i, num in enumerate(one_D_board):
+            row.append(num)
 
-                if (i + 1) % 9 == 0:
-                    two_D_board.append(row)
-                    row = []
+            if (i + 1) % 9 == 0:
+                two_D_board.append(row)
+                row = []
 
-            sudoku.auto_sudoku(two_D_board)
+        sudoku.auto_sudoku(two_D_board)
 
 
 def letter_boxed():
@@ -126,12 +139,11 @@ def letter_boxed():
     print("2 - NYT")
 
     menu_input = get_menu_input(2)
-    match menu_input:
-        case 1:
-            letter_boxed.play_letter_boxed()
-        case 2:
-            board = request_NYT_data("letter boxed")
-            letter_boxed.auto_letter_boxed(board)
+    if menu_input == 1:
+        letter_boxed.play_letter_boxed()
+    elif menu_input == 2:
+        board = request_NYT_data("letter boxed")
+        letter_boxed.auto_letter_boxed(board)
 
 
 def request_NYT_data(game):
@@ -173,36 +185,34 @@ def request_NYT_data(game):
         for element in answers_tags:
             words = re.search(r': (.*)', element.text).group(1)
             solution = words.split(', ')
-            solutions.append(solution)
+            solutions.append([word.lower() for word in solution])
 
         return solutions
 
     def sudoku_data(difficulty):
         json = get_game_data("https://www.nytimes.com/puzzles/sudoku")
 
-        match difficulty:
-            case "easy":
-                return json["easy"]["puzzle_data"]["puzzle"]
-            case "medium":
-                return json["medium"]["puzzle_data"]["puzzle"]
-            case "hard":
-                return json["hard"]["puzzle_data"]["puzzle"]
+        if difficulty == "easy":
+            return json["easy"]["puzzle_data"]["puzzle"]
+        elif difficulty == "medium":
+            return json["medium"]["puzzle_data"]["puzzle"]
+        elif difficulty == "hard":
+            return json["hard"]["puzzle_data"]["puzzle"]
 
     def letter_boxed_data():
         json = get_game_data("https://www.nytimes.com/puzzles/letter-boxed")
 
         return json["sides"]
 
-    match game:
-        case "spelling bee":
-            return spelling_bee_data()
-        case "connections":
-            return connections_data()
-        case _ if game.startswith("sudoku"):
-            difficulty = game.split()[1]
-            return sudoku_data(difficulty)
-        case "letter boxed":
-            return letter_boxed_data()
+    if game == "spelling bee":
+        return spelling_bee_data()
+    elif game == "connections":
+        return connections_data()
+    elif game.startswith("sudoku"):
+        difficulty = game.split()[1]
+        return sudoku_data(difficulty)
+    elif game == "letter boxed":
+        return letter_boxed_data()
 
     raise ValueError
 
@@ -241,21 +251,20 @@ if __name__ == "__main__":
         print("6 - Letter Boxed")
 
         menu_input = get_menu_input(6)
-        match menu_input:
-            case 1:
-                spelling_bee()
-            case 2:
-                wordle()
-            case 3:
-                connections()
-            case 4:
-                crossword()
-            case 5:
-                sudoku()
-            case 6:
-                letter_boxed()
-            case "q":
-                break
+        if menu_input == 1:
+            spelling_bee()
+        elif menu_input == 2:
+            wordle()
+        elif menu_input == 3:
+            connections()
+        elif menu_input == 4:
+            crossword()
+        elif menu_input == 5:
+            sudoku()
+        elif menu_input == 6:
+            letter_boxed()
+        elif menu_input == "q":
+            break
 
         print("Play another game? (y/n)")
         replay = input()
