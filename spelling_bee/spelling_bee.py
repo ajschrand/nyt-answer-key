@@ -25,10 +25,10 @@ def play_spelling_bee():
 
     Prompts the user for letters and the yellow letter.
     """
-    print("Enter the letters")
+    print("Enter the letters as one string (e.g. 'abcdefg')")
     letters_list = input()
     
-    print("Enter the yellow letter")
+    print("Enter the center (yellow) letter")
     center_letter = input()
     
     auto_spelling_bee(center_letter, letters_list)

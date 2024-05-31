@@ -1,6 +1,5 @@
 # Local files
 wordle/wordle_stats_gen.py
-wordle/wordle_answers_alphabetical.txt
 wordle/wordle_answers_scores.csv
 wordle/wordle_starting_answers.csv
 wordle/wordle_starting_words.csv

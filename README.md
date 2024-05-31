@@ -4,6 +4,8 @@ This app implements automated solvers for a variety of games in the New York Tim
 
 The app is currently interactable via Command Line Interface (CLI). To start the app, download the code and run `python main.py` in the parent directory.
 
+The CLI will prompt you with a series of menu options that let you choose which game to play and how you want to play it. Enter a number on the menu to select its corresponding option until you have selected a game to play. Then, follow the instructions printed for that game.
+
 
 # Games
 

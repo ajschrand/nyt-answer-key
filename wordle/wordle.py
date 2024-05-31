@@ -4,30 +4,12 @@ import json
 
 from statistics import median
 from utils import word_has_duplicates
-from collections import defaultdict
 from pathlib import Path
 cwd = Path(__file__).resolve().parent
 
 DEFAULT_STARTING_GUESS = "crate"
-
-VALID_WORDLE_ANSWERS = []
-with open(f"{cwd}\\wordle_answers_alphabetical.txt", 'r') as f:
-    for line in f:
-        VALID_WORDLE_ANSWERS.append(line.strip())
-
-# Calculate the frequency of the appearance of each letter in the valid Wordle answers
-# If the letter frequencies have already been calculated, load them from the file
-# Otherwise, calculate them and save them to the file
-LETTER_FREQUENCIES_ANSWERS = None
-if os.path.exists(f"{cwd}\\letter_frequencies.txt"):
-    LETTER_FREQUENCIES_ANSWERS = json.load(open(f"{cwd}\\letter_frequencies.txt", 'r'))
-else:
-    LETTER_FREQUENCIES_ANSWERS = defaultdict(lambda: defaultdict(int))
-    for answer in VALID_WORDLE_ANSWERS:
-        for i, letter in enumerate(answer):
-            LETTER_FREQUENCIES_ANSWERS[str(i)][letter] += 1
-
-    json.dump(LETTER_FREQUENCIES_ANSWERS, open(f"{cwd}\\letter_frequencies.txt", 'w'))
+VALID_WORDLE_ANSWERS = json.load(open(f"{cwd}\\wordle_answers.txt", 'r'))
+LETTER_FREQUENCIES_ANSWERS = json.load(open(f"{cwd}\\letter_frequencies.txt", 'r'))
 
 
 # Play Wordle manually
@@ -37,6 +19,9 @@ else:
 def play_wordle():
     print("Welcome to Wordle Solver!")
     print("Enter your guess followed by its info string.")
+    print("An info string is a string of 0s, 1s, and 2s")
+    print("where 0 = black, 1 = yellow, 2 = green")
+    print("e.g. 'space 20212'")
 
     guess_str = input("Guess: ")
     guess_info = {}

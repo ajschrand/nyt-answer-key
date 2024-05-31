@@ -29,6 +29,7 @@ def play_connections():
     print(f"Suggested guess: {best_grouping}")
 
     print("Enter a guess with the number of known grouped items after it")
+    print("in the format 'word1 word2 word3 word4;num_grouped'")
     guess_input = input()
 
     found_solutions = []
@@ -58,7 +59,7 @@ def play_connections():
                 print(grouping)
             break
 
-        print("Enter a guess with the number of known grouped items after it")
+        print("Enter a guess")
         guess_input = input()
 
 

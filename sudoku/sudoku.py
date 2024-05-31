@@ -103,10 +103,15 @@ class SudokuBoard:
     
 def play_sudoku():
     print("Enter the sudoku board one line at a time")
+    print("A line e.g. '100030058'")
     
     board = []
     for _ in range(9):
-        board.append([int(char) for char in input()])
+        input_str = input()
+        if input_str == "q":
+            return
+        
+        board.append([int(char) for char in input_str])
     
     auto_sudoku(board)
 

@@ -4,6 +4,7 @@ from utils import get_english_words
 
 def play_letter_boxed():
     print("Enter the letters one side at a time")
+    print("A side e.g. 'abc'")
     
     board = []
     for _ in range(4):
@@ -13,7 +14,7 @@ def play_letter_boxed():
 
 
 def auto_letter_boxed(board):
-    board = [letter.lower() for letter in board]
+    board = [letter for letter in board]
     validWords = find_valid_words(board)
     
     one_word_solutions = find_one_word_solutions(board, validWords)
