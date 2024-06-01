@@ -38,12 +38,6 @@ The Connections solver plays in the following manner:
  5. Recieve feedback on the quality of the guess and eliminate now-invalid groupings accordingly.
  6. If the puzzle is not solved, return to step 4.
 
-## Crossword
-
-Crossword puzzles are word puzzles that are usually in the shape of a square or rectangle.  The puzzle consists of black and white squares.  The goal of a crossword is to fill the white boxes with the answers to a series of questions.  The shaded squares separate the answers.
-
-The crossword solver is not currently implemented.
-
 ## Sudoku
 
 Sudoku is a number game played on a grid of 9 x 9 spaces. Within the rows and columns are 9 squares made up of 3 x 3 spaces. Each row, column and square must be filled with the numbers 1-9, without repeating any numbers within the row, column or square.

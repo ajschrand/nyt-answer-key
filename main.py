@@ -86,14 +86,6 @@ def connections():
             connections.auto_connections(solutions)
 
 
-def crossword():
-    from crossword import crossword
-
-    # TODO entire crossword player lol
-
-    print("Crossword player is currently a work in progress.")
-
-
 def sudoku():
     from sudoku import sudoku
 
@@ -153,11 +145,10 @@ if __name__ == "__main__":
         print("1 - Spelling Bee")
         print("2 - Wordle")
         print("3 - Connections")
-        print("4 - Crossword")
-        print("5 - Sudoku")
-        print("6 - Letter Boxed")
+        print("4 - Sudoku")
+        print("5 - Letter Boxed")
 
-        menu_input = get_menu_input(6)
+        menu_input = get_menu_input(5)
         if menu_input == 1:
             spelling_bee()
         elif menu_input == 2:
@@ -165,10 +156,8 @@ if __name__ == "__main__":
         elif menu_input == 3:
             connections()
         elif menu_input == 4:
-            crossword()
-        elif menu_input == 5:
             sudoku()
-        elif menu_input == 6:
+        elif menu_input == 5:
             letter_boxed()
         elif menu_input == "q":
             break
