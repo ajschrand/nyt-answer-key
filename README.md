@@ -38,6 +38,8 @@ The Connections solver plays in the following manner:
  5. Recieve feedback on the quality of the guess and eliminate now-invalid groupings accordingly.
  6. If the puzzle is not solved, return to step 4.
 
+ Be aware that the Connections solver performs very poorly in human terms. Grouping words together is a very abstract task, and this particular algorithm cannot accomplish it in the allotted amount of guesses for a typical Connections game.
+
 ## Sudoku
 
 Sudoku is a number game played on a grid of 9 x 9 spaces. Within the rows and columns are 9 squares made up of 3 x 3 spaces. Each row, column and square must be filled with the numbers 1-9, without repeating any numbers within the row, column or square.
@@ -56,3 +58,13 @@ Letter Boxed is a game where players must create a sequence of words that uses a
 The Letter Boxed solver starts with a list of all English words and eliminates the words that cannot be formed using the given square. Then, it finds all one and two word solutions for the given square from the list of valid words as follows:
  - It finds one word solutions by getting all the words from the valid words list that contain all 12 letters from the square. There are usually no such words.
  - It finds two word solutions by starting with each valid word, finding the valid words that begin with its last letter, and determining whether the two words together use all 12 letters from the square. The NYT guarantees that at least one such solution will exist.
+
+
+# Other
+
+## Inspiration
+
+Inspired by @aliceyliang and @sadmoody.
+Check out their projects here:
+https://letterboxed.aliceyliang.com/
+https://sadmoody.github.io/unwordle/
