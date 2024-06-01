@@ -14,7 +14,7 @@ def play_letter_boxed():
 
 
 def auto_letter_boxed(board):
-    board = [letter for letter in board]
+    board = [[char.lower() for char in side] for side in board]
     validWords = find_valid_words(board)
     
     one_word_solutions = find_one_word_solutions(board, validWords)

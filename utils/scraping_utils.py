@@ -2,9 +2,11 @@ from requests import get as requests_get
 from bs4 import BeautifulSoup
 import re
 
+
 def get_soup(link):
     r = requests_get(link)
     return BeautifulSoup(r.text, features="html.parser")
+
 
 def get_game_data(link):
     from json import loads
@@ -15,10 +17,19 @@ def get_game_data(link):
 
     return json
 
+
+def wordle_data():
+    s = get_soup("https://www.techradar.com/news/wordle-today")
+    answer_header = s.find(string=re.compile(r"…"))
+    answer_tag = answer_header.find_next('strong')
+    return answer_tag.text.lower().strip()
+    
+
 def spelling_bee_data():
     json = get_game_data("https://www.nytimes.com/puzzles/spelling-bee")
 
     return json["today"]["centerLetter"], json["today"]["validLetters"]
+
 
 def connections_data():
     from datetime import datetime
@@ -40,6 +51,7 @@ def connections_data():
 
     return solutions
 
+
 def sudoku_data(difficulty):
     json = get_game_data("https://www.nytimes.com/puzzles/sudoku")
 
@@ -50,7 +62,9 @@ def sudoku_data(difficulty):
     elif difficulty == "hard":
         return json["hard"]["puzzle_data"]["puzzle"]
 
+
 def letter_boxed_data():
     json = get_game_data("https://www.nytimes.com/puzzles/letter-boxed")
     board = [side.lower() for side in json["sides"]]
     return board
+

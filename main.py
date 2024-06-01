@@ -1,6 +1,7 @@
 from utils.str_utils import get_menu_input
 from utils import scraping_utils
 
+
 def spelling_bee():
     from spelling_bee import spelling_bee
 
@@ -32,16 +33,15 @@ def wordle():
         print("2 - NYT")
 
         menu_input = get_menu_input(2)
-        word = ""
         if menu_input == 1:
             print("Enter the word to guess")
             word = input()
-        elif menu_input == 2:
-            # TODO get today's wordle word
-            pass
+            print("")
 
-        print("")
-        wordle.auto_wordle(word, print_guesses=True)
+            wordle.auto_wordle(word, print_guesses=True)
+        elif menu_input == 2:
+            wordle.auto_wordle(scraping_utils.wordle_data(),
+                               print_guesses=True)
 
 
 def connections():
