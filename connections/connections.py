@@ -5,7 +5,7 @@ from collections import OrderedDict
 from collections import defaultdict
 from more_itertools import distinct_combinations
 from statistics import median
-from utils import get_list_grid
+from utils.str_utils import get_list_grid
 from colorama import Fore
 
 # Takes as input a connections game board followed by guesses.

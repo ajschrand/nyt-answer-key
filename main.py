@@ -1,5 +1,5 @@
-from utils import get_menu_input
-
+from utils.str_utils import get_menu_input
+from utils import scraping_utils
 
 def spelling_bee():
     from spelling_bee import spelling_bee
@@ -12,7 +12,7 @@ def spelling_bee():
     if menu_input == 1:
         spelling_bee.play_spelling_bee()
     elif menu_input == 2:
-        center_letter, letters_list = request_NYT_data("spelling bee")
+        center_letter, letters_list = scraping_utils.spelling_bee_data()
         spelling_bee.auto_spelling_bee(center_letter, letters_list)
 
 
@@ -72,7 +72,7 @@ def connections():
             print("")
             connections.auto_connections(solutions)
     elif puzzle_source == 2:
-        solutions = request_NYT_data("connections")
+        solutions = scraping_utils.connections_data()
 
         if game_type == 1:
             from random import shuffle
@@ -113,11 +113,11 @@ def sudoku():
         menu_input = get_menu_input(3)
         one_D_board = []
         if menu_input == 1:
-            one_D_board = request_NYT_data("sudoku easy")
+            one_D_board = scraping_utils.sudoku_data("easy")
         elif menu_input == 2:
-            one_D_board = request_NYT_data("sudoku medium")
+            one_D_board = scraping_utils.sudoku_data("medium")
         elif menu_input == 3:
-            one_D_board = request_NYT_data("sudoku hard")
+            one_D_board = scraping_utils.sudoku_data("hard")
 
         two_D_board = []
         row = []
@@ -142,101 +142,8 @@ def letter_boxed():
     if menu_input == 1:
         letter_boxed.play_letter_boxed()
     elif menu_input == 2:
-        board = request_NYT_data("letter boxed")
+        board = scraping_utils.letter_boxed_data()
         letter_boxed.auto_letter_boxed(board)
-
-
-def request_NYT_data(game):
-    from requests import get as requests_get
-    from bs4 import BeautifulSoup
-    import re
-
-    def get_soup(link):
-        r = requests_get(link)
-        return BeautifulSoup(r.text, features="html.parser")
-
-    def get_game_data(link):
-        from json import loads
-
-        s = get_soup(link)
-        tag = s.find(string=re.compile(r"window\.gameData"))
-        json = loads(tag.string.removeprefix("window.gameData = "))
-
-        return json
-
-    def spelling_bee_data():
-        json = get_game_data("https://www.nytimes.com/puzzles/spelling-bee")
-
-        return json["today"]["centerLetter"], json["today"]["validLetters"]
-
-    def connections_data():
-        from datetime import datetime
-
-        today = datetime.today().strftime("%d-%m-%y")
-        link = f"https://www.rockpapershotgun.com/wordle-connections-hint-and-answer-{
-            today}"
-        s = get_soup(link)
-        answers_header = s.find(string=re.compile(
-            r"What is the answer to Connections today"))
-        answers_list = answers_header.find_next('ul')
-        answers_tags = answers_list.find_all('li')
-
-        solutions = []
-        for element in answers_tags:
-            words = re.search(r': (.*)', element.text).group(1)
-            solution = words.split(', ')
-            solutions.append([word.lower() for word in solution])
-
-        return solutions
-
-    def sudoku_data(difficulty):
-        json = get_game_data("https://www.nytimes.com/puzzles/sudoku")
-
-        if difficulty == "easy":
-            return json["easy"]["puzzle_data"]["puzzle"]
-        elif difficulty == "medium":
-            return json["medium"]["puzzle_data"]["puzzle"]
-        elif difficulty == "hard":
-            return json["hard"]["puzzle_data"]["puzzle"]
-
-    def letter_boxed_data():
-        json = get_game_data("https://www.nytimes.com/puzzles/letter-boxed")
-        board = [side.lower() for side in json["sides"]]
-        return board
-
-    if game == "spelling bee":
-        return spelling_bee_data()
-    elif game == "connections":
-        return connections_data()
-    elif game.startswith("sudoku"):
-        difficulty = game.split()[1]
-        return sudoku_data(difficulty)
-    elif game == "letter boxed":
-        return letter_boxed_data()
-
-    raise ValueError
-
-
-# def scrapeNYTData(game):
-#     from selenium import webdriver
-#     from selenium.webdriver.common.keys import Keys
-#     from selenium.webdriver.common.by import By
-
-#     driver = webdriver.Chrome()
-#     driver.get("http://www.python.org")
-
-#     assert "Python" in driver.title
-
-#     elem = driver.find_element(By.NAME, "q")
-#     elem.clear()
-#     elem.send_keys("pycon")
-#     elem.send_keys(Keys.RETURN)
-
-#     assert "No results found." not in driver.page_source
-
-#     driver.close()
-
-#     return game
 
 
 if __name__ == "__main__":

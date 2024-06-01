@@ -2,7 +2,7 @@ import wordfreq as wf
 import json
 
 from statistics import median
-from utils import word_has_duplicates
+from utils.str_utils import word_has_duplicates
 from pathlib import Path
 cwd = Path(__file__).resolve().parent
 

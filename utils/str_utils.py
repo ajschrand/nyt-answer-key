@@ -67,17 +67,3 @@ def get_english_words():
 
     return load(open(f"{cwd}\\english_words.txt", 'r'))
 
-
-if __name__ == "__main__":
-    # import json
-
-    # words = []
-    # with open("words_alpha.txt") as file:
-    #     for word in file:
-    #         words.append(word.strip())
-
-    # json.dump(words, open(f"english-words.txt", 'w'))
-
-    with open("english-words-lines.txt", "w") as file:
-        for word in get_english_words():
-            file.write(word + "\n")

@@ -11,8 +11,8 @@ sys.path.append(str(parent_dir))
 # ------------------------------------------
 
 import re
-from utils import get_list_grid
-from utils import get_english_words
+from utils.str_utils import get_list_grid
+from utils.str_utils import get_english_words
 
 class CrosswordBoard:
     def __init__(self, fen) -> None:

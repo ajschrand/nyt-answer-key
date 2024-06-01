@@ -1,6 +1,6 @@
-from utils import get_list_grid
-from utils import word_has_all
-from utils import get_english_words
+from utils.str_utils import get_list_grid
+from utils.str_utils import word_has_all
+from utils.str_utils import get_english_words
 
 def play_letter_boxed():
     print("Enter the letters one side at a time")
@@ -22,7 +22,7 @@ def auto_letter_boxed(board):
     two_word_solutions.sort(key=lambda x: len(x[0]) + len(x[1]))
     
     print(get_list_grid(one_word_solutions, 1))
-    print(get_list_grid(two_word_solutions[:50], 1))
+    print(get_list_grid(two_word_solutions[:10], 1))
     
 
 def find_valid_words(board):

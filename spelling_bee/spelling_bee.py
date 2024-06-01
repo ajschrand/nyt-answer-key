@@ -15,9 +15,9 @@ Dependencies:
 * utils.py: Contains helper functions.
 """
 
-from utils import word_has_only
-from utils import word_has_all
-from utils import get_english_words
+from utils.str_utils import word_has_only
+from utils.str_utils import word_has_all
+from utils.str_utils import get_english_words
 
 def play_spelling_bee():
     """
