@@ -11,6 +11,9 @@ from colorama import Fore
 # Takes as input a connections game board followed by guesses.
 # The board is represented as a 16 length list of words,
 # and the guesses are tuples with lists of words and the number of those words properly grouped.
+# 
+# "MGS" stands for "Median Grouping (semantic) Similarities"
+# It is the metric for how good of a guess a grouping is.
 #
 # https://www.nytimes.com/games/connections
 def play_connections():
@@ -18,8 +21,6 @@ def play_connections():
     word_list = input().split()
 
     all_groupings = distinct_combinations(word_list, 4)
-    # "MGS" stands for "median grouping similarities"
-    # It is the metric for how good of a guess a grouping is
     mgs = get_mgs(all_groupings)
     remaining_groupings = OrderedDict(
         sorted(mgs.items(), key=lambda x: x[1], reverse=True))

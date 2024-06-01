@@ -22,7 +22,7 @@ def auto_letter_boxed(board):
     two_word_solutions.sort(key=lambda x: len(x[0]) + len(x[1]))
     
     print(get_list_grid(one_word_solutions, 1))
-    print(get_list_grid(two_word_solutions, 1))
+    print(get_list_grid(two_word_solutions[:50], 1))
     
 
 def find_valid_words(board):

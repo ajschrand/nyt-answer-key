@@ -1,4 +1,3 @@
-import os
 import wordfreq as wf
 import json
 

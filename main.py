@@ -201,8 +201,8 @@ def request_NYT_data(game):
 
     def letter_boxed_data():
         json = get_game_data("https://www.nytimes.com/puzzles/letter-boxed")
-
-        return json["sides"]
+        board = [side.lower() for side in json["sides"]]
+        return board
 
     if game == "spelling bee":
         return spelling_bee_data()

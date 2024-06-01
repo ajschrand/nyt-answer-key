@@ -16,8 +16,8 @@ Dependencies:
 """
 
 from utils import word_has_only
-from utils import get_english_words
 from utils import word_has_all
+from utils import get_english_words
 
 def play_spelling_bee():
     """
@@ -48,7 +48,7 @@ def auto_spelling_bee(center_letter, letters_list):
         """
         Gets the point value for valid words for the Spelling Bee game.
         
-        4-letter words are worth 1 point each.
+        4-letter words are worth 1 point.
         Longer words earn 1 point per letter.
         Each puzzle includes at least one “pangram” which uses every letter.
         Pangrams are worth 1 point per letter plus 7 extra points.
