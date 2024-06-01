@@ -64,7 +64,6 @@ The Letter Boxed solver starts with a list of all English words and eliminates t
 
 ## Inspiration
 
-Inspired by @aliceyliang and @sadmoody.
-Check out their projects here:
-https://letterboxed.aliceyliang.com/
+Inspired by @aliceyliang and @sadmoody. Check out their projects! \
+https://letterboxed.aliceyliang.com/ \
 https://sadmoody.github.io/unwordle/
