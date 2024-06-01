@@ -3,6 +3,9 @@ from utils.str_utils import word_has_all
 from utils.str_utils import get_english_words
 
 def play_letter_boxed():
+    """
+    Play a game of Letter Boxed by entering the board state
+    """
     print("Enter the letters one side at a time")
     print("A side e.g. 'abc'")
     
@@ -14,6 +17,12 @@ def play_letter_boxed():
 
 
 def auto_letter_boxed(board):
+    """
+    Automatically solve a game of Letter Boxed
+
+    Args:
+        board (List): A 4x3 2D list representing the Letter Boxed board
+    """
     board = [[char.lower() for char in side] for side in board]
     validWords = find_valid_words(board)
     
@@ -26,6 +35,15 @@ def auto_letter_boxed(board):
     
 
 def find_valid_words(board):
+    """
+    Finds all valid words that can be made from the given board
+
+    Args:
+        board (List): A 4x3 2D list representing the Letter Boxed board
+
+    Returns:
+        List: A list of valid words that can be made from the board
+    """
     letter_locations = {"": -1}
     for i, side in enumerate(board):
         for letter in side:
@@ -48,11 +66,31 @@ def find_valid_words(board):
 
 
 def find_one_word_solutions(board, words):
+    """
+    Finds all one-word solutions that can be made from the given board
+
+    Args:
+        board (List): A 4x3 2D list representing the Letter Boxed board
+        words (List): A list of valid words that can be made from the board
+
+    Returns:
+        List: A list of one-word solutions that can be made from the board
+    """
     letters = [letter for side in board for letter in side]
     return [word for word in words if word_has_all(word, letters)]
 
 
 def find_two_word_solutions(board, words):
+    """
+    Finds all two-word solutions that can be made from the given board
+
+    Args:
+        board (List): A 4x3 2D list representing the Letter Boxed board
+        words (List): A list of valid words that can be made from the board
+
+    Returns:
+        List: A list of two-word solutions that can be made from the board
+    """
     letters = [letter for side in board for letter in side]
     
     first_letter_to_word = {}

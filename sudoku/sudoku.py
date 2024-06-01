@@ -102,6 +102,9 @@ class SudokuBoard:
     
     
 def play_sudoku():
+    """
+    Play a game of Sudoku by inputting the initial board state.
+    """
     print("Enter the sudoku board one line at a time")
     print("A line e.g. '100030058'")
     
@@ -117,6 +120,12 @@ def play_sudoku():
 
 
 def auto_sudoku(board):
+    """
+    Solve a Sudoku board automatically.
+
+    Args:
+        board (List): A 9x9 2D list representing the initial Sudoku board.
+    """
     s = SudokuBoard(board)
     s.solve_sudoku()
     print(s)

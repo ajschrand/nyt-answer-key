@@ -28,9 +28,9 @@ def wordle():
     if menu_input == 1:
         wordle.play_wordle()
     elif menu_input == 2:
-        print("Solve custom word or current NYT word?")
-        print("1 - Custom")
-        print("2 - NYT")
+        print("Solve specific NYT word or current NYT word?")
+        print("1 - Specific")
+        print("2 - Current")
 
         menu_input = get_menu_input(2)
         if menu_input == 1:
@@ -63,8 +63,7 @@ def connections():
         if game_type == 1:
             connections.play_connections()
         elif game_type == 2:
-            print(
-                "Enter 4 solution groups as lists of words separated by spaces, each on its own line")
+            print("Enter 4 solution groups as lists of words separated by spaces, each on its own line")
             solutions = []
             for _ in range(4):
                 solutions.append(input().split())
@@ -165,3 +164,4 @@ if __name__ == "__main__":
         print("Play another game? (y/n)")
         replay = input()
         print("")
+

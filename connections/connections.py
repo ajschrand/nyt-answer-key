@@ -8,15 +8,18 @@ from statistics import median
 from utils.str_utils import get_list_grid
 from colorama import Fore
 
-# Takes as input a connections game board followed by guesses.
-# The board is represented as a 16 length list of words,
-# and the guesses are tuples with lists of words and the number of those words properly grouped.
-# 
-# "MGS" stands for "Median Grouping (semantic) Similarities"
-# It is the metric for how good of a guess a grouping is.
-#
-# https://www.nytimes.com/games/connections
 def play_connections():
+    """
+    Takes as input a connections game board followed by guesses.
+    The board is represented as a 16 length list of words,
+    and the guesses are tuples with lists of words and the number of those words properly grouped.
+    
+    "MGS" stands for "Median Grouping (semantic) Similarities"
+    It is the metric for how good of a guess a grouping is.
+    The higher the MGS, the better the guess.
+
+    https://www.nytimes.com/games/connections
+    """
     print("Enter the 16 words separated by spaces")
     word_list = input().split()
 
@@ -65,6 +68,12 @@ def play_connections():
 
 
 def auto_connections(actual_solutions):
+    """
+    Plays the connections game automatically using the actual solutions as input
+
+    Args:
+        actual_solutions (List): A list of 4 lists of words representing the actual solutions
+    """
     def get_num_grouped(guessed_grouping, eight_left):
         # Map to track guessed word appearance count by grouping index
         guess_locations = defaultdict(int)
@@ -106,18 +115,34 @@ def auto_connections(actual_solutions):
             remaining_groupings, best_grouping, num_grouped)
 
 
-# Turns a raw guess string into a list of guessed words and
-# its number of properly grouped words
 def process_guess_input(guess_input):
+    """
+    Turns a raw guess string into a list of guessed words and
+    its number of properly grouped words
+
+    Args:
+        guess_input (String): The raw guess input
+
+    Returns:
+        Tuple: A tuple containing the guessed words and the number of properly grouped words
+    """
     guess, num_grouped = guess_input.split(";")
     guess = guess.split()
     num_grouped = int(num_grouped)
     return guess, num_grouped
 
 
-# Calculates the median of the semantic similarities of all pairs of words
-# in a grouping for all groupings in the input list
 def get_mgs(groupings):
+    """
+    Calculates the median of the semantic similarities of all pairs of words
+    in a grouping for all groupings in the input list
+
+    Args:
+        groupings (List): A list of groupings to calculate the median semantic similarity for
+
+    Returns:
+        Dict: The median semantic similarity for each grouping
+    """
     nlp = spacy.load("en_core_web_md")
 
     mgs = {}
@@ -145,13 +170,33 @@ def get_mgs(groupings):
     return mgs
 
 
-# Eliminates the groupings in the passed {grouping: similarity} dict
-# that are not valid for the given guess
 def reduce_remaining_groupings(prev_remaining_groupings, guess, num_grouped):
-    # Determines if a grouping is valid for a given guess
-    # by checking the number of words in that grouping
-    # against the number of properly grouped words given in the clue
+    """
+    Eliminates the groupings in the passed {grouping: similarity} dict
+    that are not valid for the given guess
+
+    Args:
+        prev_remaining_groupings (Dict): A dictionary of groupings to their similarity values
+        guess (List): The guessed words
+        num_grouped (int): The number of properly grouped words in the guess
+
+    Returns:
+        Dict: The reduced dictionary of groupings that are valid with the given guess
+    """
     def is_grouping_valid(grouping, guess, num_grouped):
+        """
+        Determines if a grouping is valid for a given guess
+        by checking the number of words in that grouping
+        against the number of properly grouped words given in the clue
+
+        Args:
+            grouping (List): The grouping of words to check
+            guess (List): The guessed words
+            num_grouped (int): The number of properly grouped words given in the clue
+
+        Returns:
+            bool: True if the grouping is valid for the guess, False otherwise
+        """
         count = 0
         for word in guess:
             if word in grouping:
