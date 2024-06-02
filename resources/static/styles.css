@@ -1,0 +1,119 @@
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: linear-gradient(to right, #ff7e5f, #feb47b);
+    color: #333;
+}
+
+header {
+    background-color: #fff;
+    width: 100%;
+    text-align: center;
+    padding: 1em 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    margin: 0;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.games-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.game-button,
+.back-button {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    color: #fff;
+    background-color: #ff6f61;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 200px; /* Fixed width for uniform button size */
+    text-align: center;
+}
+
+.game-button:hover,
+.back-button:hover {
+    background-color: #e55d4e;
+}
+
+.footer {
+    background-color: #fff;
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.footer-links a {
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+.game-content {
+    text-align: center;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.wordle-row {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+.wordle-box {
+    width: 50px;
+    height: 50px;
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    cursor: pointer;
+    user-select: none;
+    border: 2px solid #444;
+}
+
+.wordle-box.cycle-1 {
+    background-color: yellow;
+    color: #000;
+}
+
+.wordle-box.cycle-2 {
+    background-color: green;
+    color: #fff;
+}
