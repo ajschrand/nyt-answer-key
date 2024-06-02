@@ -12,12 +12,127 @@
     </header>
     <main>
         <div class="game-content">
-            <!-- Game 1 content goes here -->
-            <p>Welcome to Game 1! Have fun playing.</p>
+            <table>
+                <!-- Generate the 9x9 Sudoku grid using a table -->
+                {% for i in range(9) %}
+                <tr>
+                    {% for j in range(9) %}
+                    <td> 
+                        <input type="text" maxlength="1">
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+            <div class="button-container">
+                <button class="action-button" id="clearButton">Clear</button>
+                <button class="action-button" id="solveButton">Solve</button>
+            </div>
+            <div class="button-container">
+                <button class="action-button" id="todaysEasyButton">Fill Today's Easy</button>
+                <button class="action-button" id="todaysMediumButton">Fill Today's Medium</button>
+                <button class="action-button" id="todaysHardButton">Fill Today's Hard</button>
+            </div>
         </div>
+
     </main>
     <footer class="footer">
         <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">Back to Game Hub</button>
     </footer>
+    <script>
+        const cells = document.querySelectorAll('td input');
+
+        // Ensure only numbers 1-9 are allowed and move to next cell on input
+        document.querySelectorAll('td input').forEach((cell, index, cells) => {
+            cell.addEventListener('input', function() {
+                if (!/^[1-9]$/.test(this.value)) {
+                    this.value = '';
+                } else {
+                    // Move to the next cell if a valid number is entered
+                    const nextCell = cells[index + 1];
+                    if (nextCell) {
+                        nextCell.focus();
+                    }
+                }
+            });
+        });
+
+        // Clear all inputs and reset focus to the first input
+        document.getElementById('clearButton').addEventListener('click', function() {
+            cells.forEach(cell => {
+                cell.value = '';
+            });
+            cells[0].focus();
+        });
+
+        function fetchPuzzleAndFill(difficulty) {
+            fetch(`/api/sudoku/${difficulty}`)
+                .then(response => response.json())
+                .then(data => {
+                    const puzzle = data['result']
+                    if (puzzle && puzzle.length === 81) {
+                        cells.forEach((cell, index) => {
+                            cell.value = puzzle[index] !== 0 ? puzzle[index] : '';
+                        });
+                    } else {
+                        console.error('Invalid puzzle data received from API');
+                    }
+                })
+                .catch(error => console.error('Error fetching puzzle:', error));
+        }
+
+        // Fetch easy puzzle from API and fill the grid
+        document.getElementById('todaysEasyButton').addEventListener('click', function() {
+            fetchPuzzleAndFill('easy');
+        });
+
+        // Fetch medium puzzle from API and fill the grid
+        document.getElementById('todaysMediumButton').addEventListener('click', function() {
+            fetchPuzzleAndFill('medium');
+        });
+
+        // Fetch hard puzzle from API and fill the grid
+        document.getElementById('todaysHardButton').addEventListener('click', function() {
+            fetchPuzzleAndFill('hard');
+        });
+
+        document.getElementById('solveButton').addEventListener('click', function() {
+            const board = [];
+            for (let i = 0; i < 9; i++) {
+                const row = [];
+                for (let j = 0; j < 9; j++) {
+                    const cell = cells[i * 9 + j];
+                    row.push(cell.value ? parseInt(cell.value, 10) : 0);
+                }
+                board.push(row);
+            }
+
+            fetch('/api/sudoku', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ board })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    solution = data['result'];
+                    if (solution && solution.length === 9) {
+                        for (let i = 0; i < 9; i++) {
+                            for (let j = 0; j < 9; j++) {
+                                const cell = cells[i * 9 + j];
+                                if (board[i][j] === 0) { // Only change empty cells
+                                    cell.value = solution[i][j];
+                                    cell.style.color = 'green';
+                                }
+                            }
+                        }
+                    } else {
+                        console.error('Invalid solved board data received from API');
+                    }
+                })
+                .catch(error => console.error('Error solving puzzle:', error));
+        });
+    </script>
 </body>
 </html>

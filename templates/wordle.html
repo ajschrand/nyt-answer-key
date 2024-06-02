@@ -13,12 +13,14 @@
     <main>
         <div class="game-content">
             <div id="wordle-container" class="wordle-container">
-                <div class="wordle-row">
-                    <div class="wordle-box"></div>
-                    <div class="wordle-box"></div>
-                    <div class="wordle-box"></div>
-                    <div class="wordle-box"></div>
-                    <div class="wordle-box"></div>
+                <div id="gameBoard">
+                    <div class="wordle-row">
+                        <div class="wordle-box"></div>
+                        <div class="wordle-box"></div>
+                        <div class="wordle-box"></div>
+                        <div class="wordle-box"></div>
+                        <div class="wordle-box"></div>
+                    </div>
                 </div>
             </div>
             <div id="best-guesses-container">
@@ -26,6 +28,7 @@
                 <ol id="best-guesses-list">
                     <!-- Best guesses will be populated here -->
                 </ol>
+                <button class="action-button" id="clearButton">Clear</button>
             </div>
         </div>
     </main>
@@ -35,9 +38,13 @@
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const gameBoard = document.getElementById('gameBoard');
+            const guessList = document.getElementById('best-guesses-list');
+            const clearWordleButton = document.getElementById('clearButton');
+            
             let currentRow = document.querySelector('.wordle-row');
             let currentBoxIndex = 0;
-            let guess_info = {};
+            let guessInfo = {};
         
             document.addEventListener('keydown', (event) => {
                 const key = event.key;
@@ -71,12 +78,30 @@
                             }
                         });
         
-                        guess_info[guess] = info;
+                        guessInfo[guess] = info;
         
-                        sendWordleData(guess_info);
+                        sendWordleData(guessInfo);
                         addNewRow();
                     }
                 }
+
+                if (key !== 'Tab') {
+                    clearWordleButton.blur();
+                }
+            });
+
+            clearWordleButton.addEventListener('click', function() {
+                // Replace all the rows with just one empty row
+                gameBoard.innerHTML = '';
+                addNewRow();
+    
+                // Reset indices and guess list
+                currentRowIndex = 0;
+                currentBoxIndex = 0;
+                guessList.innerHTML = '';
+
+                // Reset guessInfo
+                guessInfo = {};
             });
         
             function addNewRow() {
@@ -88,7 +113,7 @@
                     newBox.addEventListener('click', cycleBoxColor);
                     newRow.appendChild(newBox);
                 }
-                document.getElementById('wordle-container').appendChild(newRow);
+                gameBoard.appendChild(newRow);
                 currentRow = newRow;
                 currentBoxIndex = 0;
             }
@@ -105,18 +130,17 @@
                 }
             }
         
-            async function sendWordleData() {
+            async function sendWordleData(guessInfo) {
                 // Send the data to the backend
                 const response = await fetch('/api/wordle', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ guess_info }),
+                    body: JSON.stringify({ guessInfo }),
                 });
         
                 const result = await response.json();
-                console.log(result["result"]);
         
                 // Update the UI
                 updateBestGuesses(result["result"]);

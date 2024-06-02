@@ -31,7 +31,8 @@ def play_spelling_bee():
     print("Enter the center (yellow) letter")
     center_letter = input()
     
-    auto_spelling_bee(center_letter, letters_list)
+    answers = auto_spelling_bee(center_letter, letters_list)
+    print(answers)
     
 
 def auto_spelling_bee(center_letter, letters_list):
@@ -42,6 +43,9 @@ def auto_spelling_bee(center_letter, letters_list):
     Args:
         yellowLetter: The mandatory letter that must be in each word.
         lettersList: The list of allowed letters.
+        
+    Returns:
+        A list of valid words for the given puzzle.
     """
     
     def get_points(word):
@@ -79,4 +83,4 @@ def auto_spelling_bee(center_letter, letters_list):
         answers.append(word)
 
     answers.sort(key=get_points, reverse=True)
-    print(answers)
+    return answers

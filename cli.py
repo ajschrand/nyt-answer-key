@@ -14,7 +14,8 @@ def spelling_bee():
         spelling_bee.play_spelling_bee()
     elif menu_input == 2:
         center_letter, letters_list = scraping_utils.spelling_bee_data()
-        spelling_bee.auto_spelling_bee(center_letter, letters_list)
+        answers = spelling_bee.auto_spelling_bee(center_letter, letters_list)
+        print(answers)
 
 
 def wordle():
@@ -119,7 +120,8 @@ def sudoku():
                 two_D_board.append(row)
                 row = []
 
-        sudoku.auto_sudoku(two_D_board)
+        solution = sudoku.auto_sudoku(two_D_board)
+        print(solution)
 
 
 def letter_boxed():

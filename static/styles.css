@@ -58,6 +58,22 @@ main {
     background-color: #e55d4e;
 }
 
+.action-button {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    color: #fff;
+    background-color: #ff6f61;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-align: center;
+}
+
+.action-button:hover {
+    background-color: #e55d4e;
+}
+
 .footer {
     display: flex;
     justify-content: space-evenly;
@@ -136,16 +152,16 @@ main {
 /* Spelling Bee */
 /* ------------------------------------------------- */
 .hexagon-grid {
-    position: relative;
-    width: 210px; /* Adjust size as needed */
-    height: 242px; /* Adjust size as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px; /* Adjust gap as needed */
 }
 
 .hexagon {
     width: 60px; /* Adjust size as needed */
     height: 60px;
     background-color: lightgray;
-    position: absolute;
     clip-path: polygon(
         50% 0%, 
         100% 25%, 
@@ -154,49 +170,109 @@ main {
         0% 75%, 
         0% 25%
     );
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px; /* Increased font-size */
+    font-weight: bold;
+    user-select: none; /* Prevent text selection */
+    text-align: center;
+    line-height: 60px; /* Set line-height to match the height for vertical centering */
 }
 
 .hexagon.middle {
     background-color: yellow;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
 }
 
-.hexagon.left {
-    top: 50%;
-    left: 0;
-    transform: translate(-50%, -50%);
+.word-list-container {
+    width: 80%;
+    max-height: 300px;
+    overflow-y: scroll;
+    border: 1px solid #ddd;
+    padding: 10px;
 }
 
-.hexagon.right {
-    top: 50%;
-    right: 0;
-    transform: translate(50%, -50%);
+.word-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    column-count: 2; /* Adjust column count as needed */
+    column-gap: 20px;
 }
 
-.hexagon.top-left {
-    top: 0;
-    left: 25%;
-    transform: translate(-50%, -50%);
+.word-list li {
+    margin-bottom: 5px;
 }
 
-.hexagon.top-right {
-    top: 0;
-    left: 75%;
-    transform: translate(-50%, -50%);
+.button-container {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+/* ------------------------------------------------- */
+
+
+/* Connections */
+/* ------------------------------------------------- */
+
+/* ------------------------------------------------- */
+
+
+/* Sudoku */
+/* ------------------------------------------------- */
+table {
+    margin: 1em auto;
+    border-collapse: collapse; /* Ensure borders are collapsed for consistent thickness */
 }
 
-.hexagon.bottom-left {
-    bottom: 0;
-    left: 25%;
-    transform: translate(-50%, 50%);
+td {
+    height: 40px; /* Adjust size as needed */
+    width: 40px;
+    border: 1px solid #000;
+    text-align: center;
+    font-size: 20px;
+    background-color: white;
 }
 
-.hexagon.bottom-right {
-    bottom: 0;
-    left: 75%;
-    transform: translate(-50%, 50%);
+td input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    text-align: center;
+    font-size: 20px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
+
+td:nth-child(3n) {
+    border-right: 2px solid #000; /* Thicker right border for every third column */
+}
+
+tr:nth-child(3n) td {
+    border-bottom: 2px solid #000; /* Thicker bottom border for every third row */
+}
+
+td:first-child,
+td:nth-child(1) {
+    border-left: 2px solid #000; /* Thicker left border for the first column */
+}
+
+tr:first-child td {
+    border-top: 2px solid #000; /* Thicker top border for the first row */
+}
+
+tr:nth-child(3n+1) td {
+    border-top: 2px solid #000; /* Thicker top border for the first row of each 3x3 block */
+}
+
+td:nth-child(3n+1) {
+    border-left: 2px solid #000; /* Thicker left border for the first column of each 3x3 block */
+}
+/* ------------------------------------------------- */
+
+
+/* Letter Boxed */
+/* ------------------------------------------------- */
 
 /* ------------------------------------------------- */

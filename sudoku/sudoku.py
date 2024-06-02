@@ -116,7 +116,8 @@ def play_sudoku():
         
         board.append([int(char) for char in input_str])
     
-    auto_sudoku(board)
+    solution = auto_sudoku(board)
+    print(solution)
 
 
 def auto_sudoku(board):
@@ -125,7 +126,10 @@ def auto_sudoku(board):
 
     Args:
         board (List): A 9x9 2D list representing the initial Sudoku board.
+        
+    Returns:
+        List: A 9x9 2D list representing the solved Sudoku board.
     """
     s = SudokuBoard(board)
     s.solve_sudoku()
-    print(s)
+    return s.solved_board

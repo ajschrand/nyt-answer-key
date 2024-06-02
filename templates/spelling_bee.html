@@ -21,10 +21,105 @@
                 <div class="hexagon bottom-left"></div>
                 <div class="hexagon bottom-right"></div>
             </div>
+            <h2>Answers</h2>
+            <div class="word-list-container">
+                <ul class="word-list" id="wordList"></ul>
+            </div>
+            <div class="button-container">
+                <button class="action-button" id="clearButton">Clear</button>
+                <button class="action-button" id="todaysPuzzleButton">Fill Today's Puzzle</button>
+                <button class="action-button" id="solveButton">Solve</button>
+            </div>
         </div>
     </main>
     <footer class="footer">
         <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">Back to Game Hub</button>
     </footer>
+    <script>
+        const hexagons = document.querySelectorAll('.hexagon');
+        let currentHexagonIndex = 0;
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+    
+            if (/^[a-zA-Z]$/.test(key)) {
+                // Check if the key is a single letter
+                if (currentHexagonIndex < 7) {
+                    hexagons[currentHexagonIndex].textContent = event.key.toUpperCase();
+                    currentHexagonIndex++;
+                }
+            } else if (key === 'Backspace') {
+                // Handle backspace
+                if (currentHexagonIndex > 0) {
+                    currentHexagonIndex--;
+                    hexagons[currentHexagonIndex].textContent = '';
+                }
+            } else if (key === 'Enter') {
+                // Handle enter
+                if (currentHexagonIndex === 7) {
+                    solve();
+                }
+            }
+        });
+
+        document.getElementById('clearButton').addEventListener('click', function() {
+            hexagons.forEach(hex => hex.textContent = '');
+            currentHexagonIndex = 0;
+            document.getElementById('wordList').innerHTML = '';
+        });
+
+        document.getElementById('todaysPuzzleButton').addEventListener('click', function() {
+            fetch('/api/spelling_bee/todays_puzzle')
+            .then(response => response.json())
+            .then(data => {
+                const letters = data["result"];
+                hexagons.forEach((hex, index) => {
+                    hex.textContent = letters[index].toUpperCase();
+                });
+                document.getElementById('wordList').innerHTML = '';
+            })
+            .catch(error => console.error('Error fetching new letters:', error));
+
+            currentHexagonIndex = 7;
+        });
+
+        document.getElementById('solveButton').addEventListener('click', function() {
+            if (currentHexagonIndex === 7) {
+                solve();
+            }
+        });
+
+        function solve() {
+            const centerLetter = hexagons[0].textContent.toLowerCase();
+            const lettersList = Array.from(hexagons).map(hexagon => hexagon.textContent.toLowerCase());
+
+            console.log(centerLetter, lettersList);
+
+            sendSpellingBeeData(centerLetter, lettersList);
+        }
+
+        async function sendSpellingBeeData(centerLetter, lettersList) {
+            // Send the data to the backend
+            const response = await fetch('/api/spelling_bee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ centerLetter, lettersList }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const wordList = document.getElementById('wordList');
+                wordList.innerHTML = ''; // Clear previous words
+                const words = data["result"]
+                words.forEach(word => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = word;
+                    wordList.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error fetching words:', error));
+        }
+    </script>
 </body>
 </html>
