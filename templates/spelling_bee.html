@@ -3,29 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wordle</title>
+    <title>Spelling Bee</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <header>
-        <h1>Wordle</h1>
+        <h1>Spelling Bee</h1>
     </header>
     <main>
         <div class="game-content">
-            <div id="wordle-container" class="wordle-container">
-                <div class="wordle-row">
-                    <div class="wordle-box"></div>
-                    <div class="wordle-box"></div>
-                    <div class="wordle-box"></div>
-                    <div class="wordle-box"></div>
-                    <div class="wordle-box"></div>
-                </div>
+            <div class="hexagon-grid">
+                <div class="hexagon middle"></div>
+                <div class="hexagon left"></div>
+                <div class="hexagon right"></div>
+                <div class="hexagon top-left"></div>
+                <div class="hexagon top-right"></div>
+                <div class="hexagon bottom-left"></div>
+                <div class="hexagon bottom-right"></div>
             </div>
         </div>
     </main>
     <footer class="footer">
         <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">Back to Game Hub</button>
     </footer>
-    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
 </html>

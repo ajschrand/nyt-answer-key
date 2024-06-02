@@ -89,6 +89,18 @@ main {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Wordle */
+/* ------------------------------------------------- */
+#best-guesses-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#best-guesses-list {
+    padding-left: 0;
+    list-style-type: decimal;
+}
+
 .wordle-row {
     display: flex;
     gap: 5px;
@@ -118,3 +130,73 @@ main {
     background-color: green;
     color: #fff;
 }
+/* ------------------------------------------------- */
+
+
+/* Spelling Bee */
+/* ------------------------------------------------- */
+.hexagon-grid {
+    position: relative;
+    width: 210px; /* Adjust size as needed */
+    height: 242px; /* Adjust size as needed */
+}
+
+.hexagon {
+    width: 60px; /* Adjust size as needed */
+    height: 60px;
+    background-color: lightgray;
+    position: absolute;
+    clip-path: polygon(
+        50% 0%, 
+        100% 25%, 
+        100% 75%, 
+        50% 100%, 
+        0% 75%, 
+        0% 25%
+    );
+}
+
+.hexagon.middle {
+    background-color: yellow;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.hexagon.left {
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+}
+
+.hexagon.right {
+    top: 50%;
+    right: 0;
+    transform: translate(50%, -50%);
+}
+
+.hexagon.top-left {
+    top: 0;
+    left: 25%;
+    transform: translate(-50%, -50%);
+}
+
+.hexagon.top-right {
+    top: 0;
+    left: 75%;
+    transform: translate(-50%, -50%);
+}
+
+.hexagon.bottom-left {
+    bottom: 0;
+    left: 25%;
+    transform: translate(-50%, 50%);
+}
+
+.hexagon.bottom-right {
+    bottom: 0;
+    left: 75%;
+    transform: translate(-50%, 50%);
+}
+
+/* ------------------------------------------------- */

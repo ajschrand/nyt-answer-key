@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Wordle</h1>
+    </header>
+    <main>
+        <div class="game-content">
+            <div id="wordle-container" class="wordle-container">
+                <div class="wordle-row">
+                    <div class="wordle-box"></div>
+                    <div class="wordle-box"></div>
+                    <div class="wordle-box"></div>
+                    <div class="wordle-box"></div>
+                    <div class="wordle-box"></div>
+                </div>
+            </div>
+            <div id="best-guesses-container">
+                <h2>Best Guesses</h2>
+                <ol id="best-guesses-list">
+                    <!-- Best guesses will be populated here -->
+                </ol>
+            </div>
+        </div>
+    </main>
+    <footer class="footer">
+        <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">Back to Game Hub</button>
+    </footer>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentRow = document.querySelector('.wordle-row');
+            let currentBoxIndex = 0;
+            let guess_info = {};
+        
+            document.addEventListener('keydown', (event) => {
+                const key = event.key;
+        
+                if (/^[a-zA-Z]$/.test(key)) {
+                    // Check if the key is a single letter
+                    if (currentBoxIndex < 5) {
+                        currentRow.children[currentBoxIndex].textContent = key.toUpperCase();
+                        currentBoxIndex++;
+                    }
+                } else if (key === 'Backspace') {
+                    // Handle backspace
+                    if (currentBoxIndex > 0) {
+                        currentBoxIndex--;
+                        currentRow.children[currentBoxIndex].textContent = '';
+                    }
+                } else if (key === 'Enter') {
+                    // Handle enter
+                    if (currentBoxIndex === 5) {
+                        const guess = Array.from(currentRow.children)
+                                           .map(box => box.textContent)
+                                           .join('')
+                                           .toLowerCase();
+                        const info = Array.from(currentRow.children).map(box => {
+                            if (box.classList.contains('cycle-2')) {
+                                return 2;
+                            } else if (box.classList.contains('cycle-1')) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        });
+        
+                        guess_info[guess] = info;
+        
+                        sendWordleData(guess_info);
+                        addNewRow();
+                    }
+                }
+            });
+        
+            function addNewRow() {
+                const newRow = document.createElement('div');
+                newRow.className = 'wordle-row';
+                for (let i = 0; i < 5; i++) {
+                    const newBox = document.createElement('div');
+                    newBox.className = 'wordle-box';
+                    newBox.addEventListener('click', cycleBoxColor);
+                    newRow.appendChild(newBox);
+                }
+                document.getElementById('wordle-container').appendChild(newRow);
+                currentRow = newRow;
+                currentBoxIndex = 0;
+            }
+        
+            function cycleBoxColor(event) {
+                const box = event.target;
+                if (box.classList.contains('cycle-2')) {
+                    box.classList.remove('cycle-2');
+                } else if (box.classList.contains('cycle-1')) {
+                    box.classList.remove('cycle-1');
+                    box.classList.add('cycle-2');
+                } else {
+                    box.classList.add('cycle-1');
+                }
+            }
+        
+            async function sendWordleData() {
+                // Send the data to the backend
+                const response = await fetch('/api/wordle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ guess_info }),
+                });
+        
+                const result = await response.json();
+                console.log(result["result"]);
+        
+                // Update the UI
+                updateBestGuesses(result["result"]);
+            }
+        
+            function updateBestGuesses(bestGuesses) {
+                const bestGuessesList = document.getElementById('best-guesses-list');
+                bestGuessesList.innerHTML = '';
+                bestGuesses.slice(0, 5).forEach((guess) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = guess;
+                    bestGuessesList.appendChild(listItem);
+                });
+            }
+        
+            // Add click event listener to initial boxes
+            const initialBoxes = document.querySelectorAll('.wordle-box');
+            initialBoxes.forEach(box => box.addEventListener('click', cycleBoxColor));
+        });
+    </script>
+</body>
+</html>
