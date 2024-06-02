@@ -3,9 +3,12 @@ body {
     font-family: 'Arial', sans-serif;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
     min-height: 100vh;
     background: linear-gradient(to right, #ff7e5f, #feb47b);
     color: #333;
+    margin: 0;
+    padding: 0;
 }
 
 header {
@@ -21,11 +24,12 @@ h1 {
 }
 
 main {
-    flex: 1;
+    flex-grow: 1;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    width: 100%;
+    margin-top: 5vh;
 }
 
 .games-list {
@@ -55,6 +59,8 @@ main {
 }
 
 .footer {
+    display: flex;
+    justify-content: space-evenly;
     background-color: #fff;
     width: 100%;
     padding: 10px 0;
@@ -62,30 +68,25 @@ main {
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.footer-links a {
+.footer a {
     color: #333;
     text-decoration: none;
     font-size: 0.9em;
 }
 
-.footer-links a:hover {
+.footer a:hover {
     text-decoration: underline;
 }
 
 .game-content {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
     padding: 20px;
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
-    margin: 20px auto;
 }
 
 .wordle-row {

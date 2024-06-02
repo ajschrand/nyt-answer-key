@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else if (event.key === 'Enter') {
             if (currentBoxIndex === 5) {
-                lockRow(currentRow);
                 addNewRow();
             }
         } else if (/^[a-zA-Z]$/.test(event.key)) {
@@ -48,14 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
             box.classList.add('cycle-2');
         } else {
             box.classList.add('cycle-1');
-        }
-    }
-
-    function lockRow(row) {
-        for (let i = 0; i < row.children.length; i++) {
-            const box = row.children[i];
-            box.removeEventListener('click', cycleBoxColor);
-            box.style.cursor = 'default';
         }
     }
 

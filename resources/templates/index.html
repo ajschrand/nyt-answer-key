@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NYTGS</title>
-    <link rel="stylesheet" href="../static/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <header>
@@ -12,20 +12,18 @@
     </header>
     <main>
         <section class="games-list">
-            <button class="game-button" onclick="loadGame('spelling_bee')">Spelling Bee</button>
-            <button class="game-button" onclick="loadGame('wordle')">Wordle</button>
-            <button class="game-button" onclick="loadGame('connections')">Connections</button>
-            <button class="game-button" onclick="loadGame('sudoku')">Sudoku</button>
-            <button class="game-button" onclick="loadGame('letter_boxed')">Letter Boxed</button>
+            <button class="game-button" onclick="window.location.href='{{ url_for('spelling_bee') }}'">Spelling Bee</button>
+            <button class="game-button" onclick="window.location.href='{{ url_for('wordle') }}'">Wordle</button>
+            <button class="game-button" onclick="window.location.href='{{ url_for('connections') }}'">Connections</button>
+            <button class="game-button" onclick="window.location.href='{{ url_for('sudoku') }}'">Sudoku</button>
+            <button class="game-button" onclick="window.location.href='{{ url_for('letter_boxed') }}'">Letter Boxed</button>
         </section>
     </main>
-    <footer>
-        <div class="footer-links">
-            <a href="#about">About</a>
-            <a href="#contact">Contact</a>
-            <a href="#privacy">Privacy Policy</a>
-        </div>
+    <footer class="footer">
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="#privacy">Privacy Policy</a>
     </footer>
-    <script src="../static/scripts.js"></script>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
 </html>
