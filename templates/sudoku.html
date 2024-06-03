@@ -27,6 +27,7 @@
             <div class="button-container">
                 <button class="action-button" id="clearButton">Clear</button>
                 <button class="action-button" id="solveButton">Solve</button>
+                <button class="action-button" id="hintButton">Hint</button>
             </div>
             <div class="button-container">
                 <button class="action-button" id="todaysEasyButton">Fill Today's Easy</button>
@@ -41,6 +42,8 @@
     </footer>
     <script>
         const cells = document.querySelectorAll('td input');
+        let selectedCell = cells[0];
+        let selectedCellIndex = 0;
 
         function resetCellColors() {
             cells.forEach(cell => {
@@ -68,6 +71,19 @@
             return true;
         }
 
+        function getBoardFromCells() {
+            const board = [];
+            for (let i = 0; i < 9; i++) {
+                const row = [];
+                for (let j = 0; j < 9; j++) {
+                    const cell = cells[i * 9 + j];
+                    row.push(cell.value ? parseInt(cell.value, 10) : 0);
+                }
+                board.push(row);
+            }
+            return board;
+        }
+
         // Ensure only numbers 1-9 are allowed and move to next cell on input
         document.querySelectorAll('td input').forEach((cell, index, cells) => {
             cell.addEventListener('input', function() {
@@ -75,10 +91,12 @@
                 if (!/^[1-9]$/.test(this.value)) {
                     this.value = '';
                 } else {
-                    // Move to the next cell if a valid number is entered
-                    const nextCell = cells[index + 1];
-                    if (nextCell) {
-                        nextCell.focus();
+                    // Move to the next empty cell if a valid number is entered
+                    for (let i = index + 1; i < cells.length; i++) {
+                        if (cells[i].value === '') {
+                            cells[i].focus();
+                            break;
+                        }
                     }
                 }
             });
@@ -95,6 +113,11 @@
                         prevCell.value = '';  // Clear the previous cell's value
                     }
                 }
+            });
+
+            cell.addEventListener('focus', function() {
+                selectedCell = this;
+                selectedCellIndex = index;
             });
         });
 
@@ -140,15 +163,7 @@
         });
 
         document.getElementById('solveButton').addEventListener('click', function() {
-            const board = [];
-            for (let i = 0; i < 9; i++) {
-                const row = [];
-                for (let j = 0; j < 9; j++) {
-                    const cell = cells[i * 9 + j];
-                    row.push(cell.value ? parseInt(cell.value, 10) : 0);
-                }
-                board.push(row);
-            }
+            const board = getBoardFromCells();
 
             if (!isValidSudoku(board)) {
                 console.error('Invalid Sudoku board');
@@ -175,6 +190,34 @@
                                 }
                             }
                         }
+                    } else {
+                        console.error('Invalid solved board data received from API');
+                    }
+                })
+                .catch(error => console.error('Error solving puzzle:', error));
+        });
+
+        document.getElementById('hintButton').addEventListener('click', function() {
+            const board = getBoardFromCells();
+
+            if (!isValidSudoku(board)) {
+                console.error('Invalid Sudoku board');
+                return;
+            }
+
+            fetch('/api/sudoku', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ board })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    solution = data['result'];
+                    if (solution && solution.length === 9) {
+                        selectedCell.value = solution[Math.floor(selectedCellIndex / 9)][selectedCellIndex % 9];
+                        selectedCell.style.color = 'blue'; // Indicate this is a hint
                     } else {
                         console.error('Invalid solved board data received from API');
                     }
