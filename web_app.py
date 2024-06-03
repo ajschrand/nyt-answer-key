@@ -58,7 +58,7 @@ def api_sb_todays_puzzle():
     result = lettters_list
     return jsonify(result=result)
 
-# API endpoint for getting today's easy sudoku puzzle
+# API endpoint for solving a sudoku puzzle
 @app.route('/api/sudoku', methods=['POST'])
 def api_sudoku():
     data = request.get_json()
