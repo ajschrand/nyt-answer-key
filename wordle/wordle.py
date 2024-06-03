@@ -97,6 +97,11 @@ def generate_guesses(guess_info, words=VALID_WORDLE_ANSWERS):
     Returns:
         List: The optimized list of possible words
     """
+    if len(guess_info) == 0:
+        guesses = find_possible_words({}, words)
+        optimized = optimize_words(guesses, 0)
+        return optimized
+    
     last_guess = list(guess_info.keys())[-1]
     letters_known = sum([1 for num in guess_info[last_guess] if num != 0])
 

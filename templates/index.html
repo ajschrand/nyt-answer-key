@@ -20,10 +20,83 @@
         </section>
     </main>
     <footer class="footer">
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-        <a href="#privacy">Privacy Policy</a>
+        <a href="#about" class="footer-link" data-popup="about-popup">About</a>
+        <a href="#github" class="footer-link" data-popup="github-popup">GitHub</a>
+        <a href="#coffee" class="footer-link" data-popup="coffee-popup">Buy Me a Coffee</a>
     </footer>
-    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+
+    <!-- Popup Windows -->
+    <div id="about-popup" class="popup hidden">
+        <div class="popup-content">
+            <span class="close-popup">&times;</span>
+            <h2>About</h2>
+            <p>
+                This app implements automated solvers for a variety of games in the New York Times collection, 
+                including Spelling Bee, Wordle, Connections, Sudoku, and Letter Boxed.
+            </p>
+            <p>
+                It was created by Adam Schrand as a personal project to practice web development skills and
+                to provide a convenient way to solve these games. The app is not affiliated with the New York Times.
+            </p>
+            <p>
+                If you have any questions or feedback, feel free to reach out to me by email at
+                <a href="mailto:adam.schrand@gmail.com">adam.schrand@gmail.com</a>
+                or by opening an issue on GitHub: 
+                <a href="https://github.com/ajschrand/nyt-games/" target="_blank">ajschrand/nyt-games</a>
+                .
+            </p>
+        </div>
+    </div>
+
+    <div id="github-popup" class="popup hidden">
+        <div class="popup-content">
+            <span class="close-popup">&times;</span>
+            <h2>GitHub</h2>
+            <p>
+                Check out the source code on GitHub: 
+                <a href="https://github.com/ajschrand/nyt-games/" target="_blank">ajschrand/nyt-games</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="coffee-popup" class="popup hidden">
+        <div class="popup-content">
+            <span class="close-popup">&times;</span>
+            <h2>Buy Me a Coffee</h2>
+            <p>
+                
+            </p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            function initializePopup(linkSelector, popupId) {
+                const link = document.querySelector(linkSelector);
+                const popup = document.getElementById(popupId);
+                const closePopup = popup.querySelector('.close-popup');
+        
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    popup.classList.remove('hidden');
+                });
+        
+                closePopup.addEventListener('click', () => {
+                    popup.classList.add('hidden');
+                });
+        
+                // Close the popup when clicking outside of the content
+                window.addEventListener('click', (e) => {
+                    if (e.target === popup) {
+                        popup.classList.add('hidden');
+                    }
+                });
+            }
+        
+            // Initialize popups for each link
+            initializePopup('a[data-popup="about-popup"]', 'about-popup');
+            initializePopup('a[data-popup="github-popup"]', 'github-popup');
+            initializePopup('a[data-popup="coffee-popup"]', 'coffee-popup');
+        });
+    </script>
 </body>
 </html>

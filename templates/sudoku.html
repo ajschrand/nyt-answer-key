@@ -42,9 +42,36 @@
     <script>
         const cells = document.querySelectorAll('td input');
 
+        function resetCellColors() {
+            cells.forEach(cell => {
+                cell.style.color = 'black';
+            });
+        }
+
+        function isValidSudoku(board) {
+            const seen = new Set();
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    const cell = board[i][j];
+                    if (cell === 0) continue;
+                    const rowKey = `row ${i} has ${cell}`;
+                    const colKey = `col ${j} has ${cell}`;
+                    const boxKey = `box ${Math.floor(i / 3)}-${Math.floor(j / 3)} has ${cell}`;
+                    if (seen.has(rowKey) || seen.has(colKey) || seen.has(boxKey)) {
+                        return false;
+                    }
+                    seen.add(rowKey);
+                    seen.add(colKey);
+                    seen.add(boxKey);
+                }
+            }
+            return true;
+        }
+
         // Ensure only numbers 1-9 are allowed and move to next cell on input
         document.querySelectorAll('td input').forEach((cell, index, cells) => {
             cell.addEventListener('input', function() {
+                resetCellColors();
                 if (!/^[1-9]$/.test(this.value)) {
                     this.value = '';
                 } else {
@@ -55,10 +82,25 @@
                     }
                 }
             });
+
+            cell.addEventListener('keydown', function(e) {
+                resetCellColors();
+                if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                    // Prevent the default backspace behavior
+                    e.preventDefault();
+                    // Move to the previous cell
+                    const prevCell = cells[index - 1];
+                    if (prevCell) {
+                        prevCell.focus();
+                        prevCell.value = '';  // Clear the previous cell's value
+                    }
+                }
+            });
         });
 
         // Clear all inputs and reset focus to the first input
         document.getElementById('clearButton').addEventListener('click', function() {
+            resetCellColors();
             cells.forEach(cell => {
                 cell.value = '';
             });
@@ -66,6 +108,7 @@
         });
 
         function fetchPuzzleAndFill(difficulty) {
+            resetCellColors();
             fetch(`/api/sudoku/${difficulty}`)
                 .then(response => response.json())
                 .then(data => {
@@ -105,6 +148,11 @@
                     row.push(cell.value ? parseInt(cell.value, 10) : 0);
                 }
                 board.push(row);
+            }
+
+            if (!isValidSudoku(board)) {
+                console.error('Invalid Sudoku board');
+                return;
             }
 
             fetch('/api/sudoku', {

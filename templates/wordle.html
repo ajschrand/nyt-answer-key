@@ -159,6 +159,7 @@
             // Add click event listener to initial boxes
             const initialBoxes = document.querySelectorAll('.wordle-box');
             initialBoxes.forEach(box => box.addEventListener('click', cycleBoxColor));
+            sendWordleData(guessInfo);
         });
     </script>
 </body>
