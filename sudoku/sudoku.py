@@ -29,7 +29,7 @@ class SudokuBoard:
         """
         Solves the Sudoku board in place using backtracking.
         """
-        self.solve(self.solved_board)
+        return self.solve(self.solved_board)
 
     def solve(self, board, i=0, j=0):
         """
@@ -131,5 +131,7 @@ def auto_sudoku(board):
         List: A 9x9 2D list representing the solved Sudoku board.
     """
     s = SudokuBoard(board)
-    s.solve_sudoku()
-    return s.solved_board
+    if s.solve_sudoku():
+        return s.solved_board
+    
+    return None

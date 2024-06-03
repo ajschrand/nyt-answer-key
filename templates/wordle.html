@@ -26,7 +26,11 @@
             <div id="best-guesses-container">
                 <h2>Best Guesses</h2>
                 <ol id="best-guesses-list">
-                    <!-- Best guesses will be populated here -->
+                    <li>crane</li>
+                    <li>slate</li>
+                    <li>trace</li>
+                    <li>crate</li>
+                    <li>caret</li>
                 </ol>
                 <button class="action-button" id="clearButton">Clear</button>
             </div>
@@ -45,6 +49,8 @@
             let currentRow = document.querySelector('.wordle-row');
             let currentBoxIndex = 0;
             let guessInfo = {};
+
+            const initialBestGuesses = ['crane', 'slate', 'trace', 'crate', 'caret'];
         
             document.addEventListener('keydown', (event) => {
                 const key = event.key;
@@ -91,17 +97,22 @@
             });
 
             clearWordleButton.addEventListener('click', function() {
+                // Reset indices and guess info
+                currentRowIndex = 0;
+                currentBoxIndex = 0;
+                guessInfo = {};
+
+                // Reset guess list
+                guessList.innerHTML = '';
+                initialBestGuesses.forEach((guess) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = guess;
+                    guessList.appendChild(listItem);
+                });
+
                 // Replace all the rows with just one empty row
                 gameBoard.innerHTML = '';
                 addNewRow();
-    
-                // Reset indices and guess list
-                currentRowIndex = 0;
-                currentBoxIndex = 0;
-                guessList.innerHTML = '';
-
-                // Reset guessInfo
-                guessInfo = {};
             });
         
             function addNewRow() {
@@ -159,7 +170,6 @@
             // Add click event listener to initial boxes
             const initialBoxes = document.querySelectorAll('.wordle-box');
             initialBoxes.forEach(box => box.addEventListener('click', cycleBoxColor));
-            sendWordleData(guessInfo);
         });
     </script>
 </body>
