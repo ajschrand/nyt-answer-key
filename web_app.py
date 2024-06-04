@@ -1,12 +1,16 @@
 from flask import Flask, render_template, request, jsonify
+from random import shuffle
 
 from spelling_bee.spelling_bee import auto_spelling_bee
 from wordle.wordle import generate_guesses
 
 from sudoku.sudoku import auto_sudoku
+from letter_boxed.letter_boxed import auto_letter_boxed
 
 from utils.scraping_utils import spelling_bee_data
 from utils.scraping_utils import sudoku_data
+from utils.scraping_utils import connections_data
+from utils.scraping_utils import letter_boxed_data
 
 app = Flask(__name__)
 
@@ -85,6 +89,32 @@ def api_sudoku_medium():
 def api_sudoku_hard():
     sudoku = sudoku_data("hard")
     result = sudoku
+    return jsonify(result=result)
+
+
+
+# API endpoint for getting today's connections puzzle
+@app.route('/api/connections/todays_puzzle', methods=['GET'])
+def api_c_todays_puzzle():
+    solutions = connections_data()
+    board = [word for group in solutions for word in group]
+    shuffle(board)
+    result = board
+    return jsonify(result=result)
+
+# API endpoint for solving a letter boxed puzzle
+@app.route('/api/letter_boxed', methods=['POST'])
+def api_letter_boxed():
+    data = request.get_json()
+    board = data.get('board')
+    result = auto_letter_boxed(board)
+    return jsonify(result=result)
+
+# API endpoint for getting today's letter boxed puzzle
+@app.route('/api/letter_boxed/todays_puzzle', methods=['GET'])
+def api_lb_todays_puzzle():
+    sides = letter_boxed_data()
+    result = sides
     return jsonify(result=result)
 
 if __name__ == '__main__':

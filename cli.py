@@ -136,7 +136,8 @@ def letter_boxed():
         letter_boxed.play_letter_boxed()
     elif menu_input == 2:
         board = scraping_utils.letter_boxed_data()
-        letter_boxed.auto_letter_boxed(board)
+        solutions = letter_boxed.auto_letter_boxed(board)
+        print(solutions[:11], 1)
 
 
 if __name__ == "__main__":

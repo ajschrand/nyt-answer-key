@@ -13,7 +13,8 @@ def play_letter_boxed():
     for _ in range(4):
         board.append([char.lower() for char in input()])
     
-    auto_letter_boxed(board)
+    solutions = auto_letter_boxed(board)
+    print(get_list_grid(solutions[:11], 1))
 
 
 def auto_letter_boxed(board):
@@ -30,8 +31,9 @@ def auto_letter_boxed(board):
     two_word_solutions = find_two_word_solutions(board, validWords)
     two_word_solutions.sort(key=lambda x: len(x[0]) + len(x[1]))
     
-    print(get_list_grid(one_word_solutions, 1))
-    print(get_list_grid(two_word_solutions[:10], 1))
+    solutions = one_word_solutions + two_word_solutions
+    
+    return solutions
     
 
 def find_valid_words(board):

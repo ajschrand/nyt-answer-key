@@ -7,17 +7,169 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+    <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">Back</button>
     <header>
         <h1>Connections</h1>
     </header>
     <main>
         <div class="game-content">
-            <!-- Game 1 content goes here -->
-            <p>Welcome to Game 1! Have fun playing.</p>
+            <div class="grid-container">
+                {% for i in range(16) %}
+                <div class="grid-item">
+                    <input type="text" class="edit-mode"/>
+                </div>
+                {% endfor %}
+            </div>
+            <div id="best-guesses-container">
+                <h2>Best Guesses</h2>
+                <ol id="best-guesses-list">
+                    <li>crane</li>
+                    <li>slate</li>
+                    <li>trace</li>
+                    <li>crate</li>
+                    <li>caret</li>
+                </ol>
+            </div>
+            <div class="button-container">
+                <button class="action-button" id="fillTodaysButton">Fill Today's Puzzle</button>
+                <button class="action-button" id="submitButton" disabled >Submit Guess</button>
+            </div>
+            <div class="button-container">
+                <button class="action-button" id="clearButton">Clear</button>
+                <button class="action-button" id="deselectButton">Deselect All</button>
+                <button class="action-button" id="editButton" disabled>Exit Edit Mode</button>
+            </div>
         </div>
     </main>
-    <footer class="footer">
-        <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">Back to Game Hub</button>
-    </footer>
+    <footer class="footer"></footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const clearButton = document.getElementById("clearButton");
+            const deselectButton = document.getElementById("deselectButton");
+            const editButton = document.getElementById("editButton");
+            const fillTodaysButton = document.getElementById("fillTodaysButton");
+            const submitButton = document.getElementById("submitButton");
+            const gridItems = document.querySelectorAll(".grid-item");
+            const inputs = document.querySelectorAll(".grid-item input");
+            
+            function deselectAllGridElements() {
+                gridItems.forEach(item => item.classList.remove("selected"));
+            }
+
+            function checkAllInputsFilled() {
+                for (let i = 0; i < inputs.length; i++) {
+                    if (inputs[i].value === "") {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            function enterEditMode() {
+                inputs.forEach(input => {
+                    input.disabled = false;
+                });
+                clearButton.disabled = false;
+                fillTodaysButton.disabled = false;
+                submitButton.disabled = true;
+                gridItems.forEach(item => item.classList.remove('selectable'));
+                editButton.textContent = "Exit Edit Mode";
+
+                deselectAllGridElements();
+            }
+
+            function exitEditMode() {
+                inputs.forEach(input => {
+                    input.disabled = true;
+                });
+                clearButton.disabled = true;
+                fillTodaysButton.disabled = true;
+                submitButton.disabled = false;
+                gridItems.forEach(item => item.classList.add('selectable'));
+                editButton.textContent = "Edit Board";
+            }
+        
+            clearButton.addEventListener("click", function() {
+                inputs.forEach(input => input.value = "");
+                inputs[0].focus();
+                editButton.disabled = true;
+            });
+
+            deselectButton.addEventListener("click", function() {
+                deselectAllGridElements();
+            });
+        
+            editButton.addEventListener("click", function() {
+                const isEditing = !inputs[0].disabled;
+                inputs.forEach(input => {
+                    input.disabled = isEditing;
+                    input.classList.toggle('edit-mode', !isEditing);
+                });
+        
+                if (!isEditing) {
+                    inputs[0].focus();
+                    enterEditMode();
+                } else {
+                    exitEditMode();
+                }
+            });
+
+            fillTodaysButton.addEventListener("click", function() {
+                fetch('/api/connections/todays_puzzle') 
+                    .then(response => response.json())
+                    .then(data => {
+                        let board = data["result"]
+                        if (board && board.length === 16) {
+                            inputs.forEach((input, index) => {
+                                input.value = board[index];
+                            });
+                            editButton.disabled = false;
+                        } else {
+                            console.error('Invalid response from API');
+                        }
+                    })
+                    .catch(error => console.error('Error fetching words:', error));
+            });
+        
+            submitButton.addEventListener("click", function() {
+                // Add your submit logic here
+                deselectAllGridElements();
+            });
+
+            gridItems.forEach(item => {
+                item.addEventListener("click", function() {
+                    if (!item.querySelector("input").disabled) return;  // Ignore clicks when in edit mode
+                    if (!item.classList.contains("selectable")) return;  // Ignore clicks on non-selectable items
+
+                    item.classList.toggle("selected");
+                    const selectedItems = document.querySelectorAll(".grid-item.selected");
+                    if (selectedItems.length === 4) {
+                        gridItems.forEach(item => {
+                            if (!item.classList.contains("selected")) {
+                                item.classList.remove("selectable");
+                            }
+                        });
+                    } else {
+                        gridItems.forEach(item => {
+                            if (!item.classList.contains("selected")) {
+                                item.classList.add("selectable");
+                            }
+                        });
+                    }
+                });
+            });
+
+            inputs.forEach(input => {
+                input.addEventListener("input", function() {
+                    if (checkAllInputsFilled()) {
+                        editButton.disabled = false;
+                    } else {
+                        editButton.disabled = true;
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
