@@ -80,7 +80,6 @@
         </div>
     </footer>
     <footer class="footer"></footer>
-    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const gameBoard = document.getElementById('gameBoard');
@@ -210,11 +209,13 @@
             function updateBestGuesses(bestGuesses) {
                 const bestGuessesList = document.getElementById('best-guesses-list');
                 bestGuessesList.innerHTML = '';
-                bestGuesses.slice(0, 5).forEach((guess) => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = guess;
-                    bestGuessesList.appendChild(listItem);
-                });
+                numGuesses = Math.min(bestGuesses.length, 5);
+                for (let i = 0; i < numGuesses; i++) {
+                    const guess = bestGuesses[i];
+                    const guessItem = document.createElement('li');
+                    guessItem.textContent = guess;
+                    bestGuessesList.appendChild(guessItem);
+                }
             }
         
             // Add click event listener to initial boxes

@@ -3,7 +3,7 @@ from random import shuffle
 
 from spelling_bee.spelling_bee import auto_spelling_bee
 from wordle.wordle import generate_guesses
-
+from connections.connections import reduce_all_guesses
 from sudoku.sudoku import auto_sudoku
 from letter_boxed.letter_boxed import auto_letter_boxed
 
@@ -91,7 +91,15 @@ def api_sudoku_hard():
     result = sudoku
     return jsonify(result=result)
 
-
+# API endpoint for getting connections answers for the passed guesses
+@app.route('/api/connections', methods=['POST'])
+def api_connections():
+    data = request.get_json()
+    word_list = data.get('wordList')
+    guesses = data.get('guesses')
+    remaining_groupings = reduce_all_guesses(word_list, guesses)
+    result = list(remaining_groupings.keys())
+    return jsonify(result=result)
 
 # API endpoint for getting today's connections puzzle
 @app.route('/api/connections/todays_puzzle', methods=['GET'])

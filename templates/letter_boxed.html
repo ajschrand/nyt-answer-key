@@ -34,7 +34,6 @@
     </main>
     <footer class="footer"></footer>
     <script>
-        // make a js class for a position object that stores x, y, and offset
         class Position {
             constructor(x, y, offset) {
                 this.x = x;
@@ -50,12 +49,12 @@
         const solveButton = document.getElementById('solveButton');
         const wordList = document.getElementById('wordList');
 
-        let leftTop, leftMiddle, leftBottom, rightTop, rightMiddle, 
-            rightBottom, topLeft, topMiddle, topRight, bottomLeft, 
-            bottomMiddle, bottomRight;
-        let positions = [leftTop, leftMiddle, leftBottom, rightTop, 
-            rightMiddle, rightBottom, topLeft, topMiddle, topRight, 
-            bottomLeft, bottomMiddle, bottomRight];
+        let topLeft, topMiddle, topRight, 
+            leftTop, leftMiddle, leftBottom, 
+            rightTop, rightMiddle, rightBottom, 
+            bottomLeft, bottomMiddle, bottomRight;
+
+        let positions = [];
         
         document.addEventListener('DOMContentLoaded', () => {
             const ctx = canvas.getContext('2d');
@@ -69,6 +68,10 @@
             ctx.lineWidth = 2;
             ctx.strokeRect(squareSize, squareSize, squareSize * 2, squareSize * 2);
 
+            topLeft = new Position(canvasWidth / 3, squareSize, 'top');
+            topMiddle = new Position(canvasWidth / 2, squareSize, 'top');
+            topRight = new Position((canvasWidth * 2) / 3, squareSize, 'top');
+
             leftTop = new Position(squareSize, canvasHeight / 3, 'left');
             leftMiddle = new Position(squareSize, canvasHeight / 2, 'left');
             leftBottom = new Position(squareSize, (canvasHeight * 2) / 3, 'left');
@@ -77,15 +80,11 @@
             rightMiddle = new Position(canvasWidth - squareSize, canvasHeight / 2, 'right');
             rightBottom = new Position(canvasWidth - squareSize, (canvasHeight * 2) / 3, 'right');
 
-            topLeft = new Position(canvasWidth / 3, squareSize, 'top');
-            topMiddle = new Position(canvasWidth / 2, squareSize, 'top');
-            topRight = new Position((canvasWidth * 2) / 3, squareSize, 'top');
-
             bottomLeft = new Position(canvasWidth / 3, canvasHeight - squareSize, 'bottom');
             bottomMiddle = new Position(canvasWidth / 2, canvasHeight - squareSize, 'bottom');
             bottomRight = new Position((canvasWidth * 2) / 3, canvasHeight - squareSize, 'bottom');
 
-            positions = [leftTop, leftMiddle, leftBottom, rightTop, rightMiddle, rightBottom, topLeft, topMiddle, topRight, bottomLeft, bottomMiddle, bottomRight];
+            positions = [topLeft, topMiddle, topRight, leftTop, leftMiddle, leftBottom, rightTop, rightMiddle, rightBottom, bottomLeft, bottomMiddle, bottomRight];
 
             // Draw circles on each side
             drawAllCircles(ctx, positions);

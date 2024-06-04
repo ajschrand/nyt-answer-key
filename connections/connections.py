@@ -8,12 +8,13 @@ from statistics import median
 from utils.str_utils import get_list_grid
 from colorama import Fore
 
+
 def play_connections():
     """
     Takes as input a connections game board followed by guesses.
     The board is represented as a 16 length list of words,
     and the guesses are tuples with lists of words and the number of those words properly grouped.
-    
+
     "MGS" stands for "Median Grouping (semantic) Similarities"
     It is the metric for how good of a guess a grouping is.
     The higher the MGS, the better the guess.
@@ -215,3 +216,17 @@ def reduce_remaining_groupings(prev_remaining_groupings, guess, num_grouped):
             cur_remaining_groupings[grouping] = prev_remaining_groupings[grouping]
 
     return cur_remaining_groupings
+
+
+def reduce_all_guesses(word_list, guess_info):
+    all_groupings = distinct_combinations(word_list, 4)
+    mgs = get_mgs(all_groupings)
+    remaining_groupings = OrderedDict(
+        sorted(mgs.items(), key=lambda x: x[1], reverse=True))
+
+    for guess in guess_info:
+        remaining_groupings = reduce_remaining_groupings(
+            remaining_groupings, guess['grouping'], guess['numGrouped'])
+        
+    return remaining_groupings
+

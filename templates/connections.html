@@ -23,151 +23,228 @@
             <div id="best-guesses-container">
                 <h2>Best Guesses</h2>
                 <ol id="best-guesses-list">
-                    <li>crane</li>
-                    <li>slate</li>
-                    <li>trace</li>
-                    <li>crate</li>
-                    <li>caret</li>
+                    <li>Guesses will appear here!</li>
                 </ol>
             </div>
             <div class="button-container">
                 <button class="action-button" id="fillTodaysButton">Fill Today's Puzzle</button>
-                <button class="action-button" id="submitButton" disabled >Submit Guess</button>
+                <button class="action-button" id="clearButton">Clear</button>
             </div>
             <div class="button-container">
-                <button class="action-button" id="clearButton">Clear</button>
-                <button class="action-button" id="deselectButton">Deselect All</button>
-                <button class="action-button" id="editButton" disabled>Exit Edit Mode</button>
+                <button class="action-button" id="deselectButton" disabled>Deselect All</button>
+                <button class="action-button" id="editButton" disabled>Start Game</button>
+            </div>
+            <div class="radio-button-container">
+                <button class="action-button" id="submitButton" disabled >Submit Guess</button>
+                <label>
+                    <input type="radio" name="option" value="0" class="radio-button" disabled checked>Wrong
+                </label>
+                <label>
+                    <input type="radio" name="option" value="3" class="radio-button" disabled>One Away
+                </label>
+                <label>
+                    <input type="radio" name="option" value="4" class="radio-button" disabled>Correct
+                </label>
             </div>
         </div>
     </main>
     <footer class="footer"></footer>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const clearButton = document.getElementById("clearButton");
-            const deselectButton = document.getElementById("deselectButton");
-            const editButton = document.getElementById("editButton");
-            const fillTodaysButton = document.getElementById("fillTodaysButton");
-            const submitButton = document.getElementById("submitButton");
-            const gridItems = document.querySelectorAll(".grid-item");
-            const inputs = document.querySelectorAll(".grid-item input");
-            
-            function deselectAllGridElements() {
-                gridItems.forEach(item => item.classList.remove("selected"));
+        class Guess {
+            constructor(grouping, numGrouped) {
+                this.grouping = grouping;
+                this.numGrouped = numGrouped;
             }
+        }
 
-            function checkAllInputsFilled() {
-                for (let i = 0; i < inputs.length; i++) {
-                    if (inputs[i].value === "") {
-                        return false;
-                    }
-                }
+        const clearButton = document.getElementById("clearButton");
+        const deselectButton = document.getElementById("deselectButton");
+        const editButton = document.getElementById("editButton");
+        const fillTodaysButton = document.getElementById("fillTodaysButton");
+        const submitButton = document.getElementById("submitButton");
 
-                return true;
-            }
+        const radioButtons = document.querySelectorAll(".radio-button");
+        const bestGuessesList = document.getElementById("best-guesses-list");
 
-            function enterEditMode() {
-                inputs.forEach(input => {
-                    input.disabled = false;
-                });
-                clearButton.disabled = false;
-                fillTodaysButton.disabled = false;
-                submitButton.disabled = true;
-                gridItems.forEach(item => item.classList.remove('selectable'));
-                editButton.textContent = "Exit Edit Mode";
+        const gridItems = document.querySelectorAll(".grid-item");
+        const inputs = document.querySelectorAll(".grid-item input");
 
-                deselectAllGridElements();
-            }
+        let guesses = [];
 
-            function exitEditMode() {
-                inputs.forEach(input => {
-                    input.disabled = true;
-                });
-                clearButton.disabled = true;
-                fillTodaysButton.disabled = true;
-                submitButton.disabled = false;
-                gridItems.forEach(item => item.classList.add('selectable'));
-                editButton.textContent = "Edit Board";
-            }
-        
-            clearButton.addEventListener("click", function() {
-                inputs.forEach(input => input.value = "");
-                inputs[0].focus();
-                editButton.disabled = true;
-            });
-
-            deselectButton.addEventListener("click", function() {
-                deselectAllGridElements();
-            });
-        
-            editButton.addEventListener("click", function() {
-                const isEditing = !inputs[0].disabled;
-                inputs.forEach(input => {
-                    input.disabled = isEditing;
-                    input.classList.toggle('edit-mode', !isEditing);
-                });
-        
-                if (!isEditing) {
-                    inputs[0].focus();
-                    enterEditMode();
-                } else {
-                    exitEditMode();
-                }
-            });
-
-            fillTodaysButton.addEventListener("click", function() {
-                fetch('/api/connections/todays_puzzle') 
-                    .then(response => response.json())
-                    .then(data => {
-                        let board = data["result"]
-                        if (board && board.length === 16) {
-                            inputs.forEach((input, index) => {
-                                input.value = board[index];
-                            });
-                            editButton.disabled = false;
-                        } else {
-                            console.error('Invalid response from API');
-                        }
-                    })
-                    .catch(error => console.error('Error fetching words:', error));
-            });
-        
-            submitButton.addEventListener("click", function() {
-                // Add your submit logic here
-                deselectAllGridElements();
-            });
-
+        function deselectAllGridElements() {
             gridItems.forEach(item => {
-                item.addEventListener("click", function() {
-                    if (!item.querySelector("input").disabled) return;  // Ignore clicks when in edit mode
-                    if (!item.classList.contains("selectable")) return;  // Ignore clicks on non-selectable items
+                item.classList.remove("selected");
+                item.classList.add("selectable");
+            });
+        }
 
-                    item.classList.toggle("selected");
-                    const selectedItems = document.querySelectorAll(".grid-item.selected");
-                    if (selectedItems.length === 4) {
-                        gridItems.forEach(item => {
-                            if (!item.classList.contains("selected")) {
-                                item.classList.remove("selectable");
-                            }
-                        });
-                    } else {
-                        gridItems.forEach(item => {
-                            if (!item.classList.contains("selected")) {
-                                item.classList.add("selectable");
-                            }
-                        });
-                    }
-                });
+        function checkAllInputsFilled() {
+            for (let i = 0; i < inputs.length; i++) {
+                if (inputs[i].value === "") {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function enterEditMode() {
+            inputs.forEach(input => {
+                input.disabled = false;
             });
 
+            radioButtons.forEach(button => {
+                button.disabled = true;
+            });
+
+            clearButton.disabled = false;
+            fillTodaysButton.disabled = false;
+            submitButton.disabled = true;
+            deselectButton.disabled = true;
+
+            gridItems.forEach(item => item.classList.remove('selectable'));
+            editButton.textContent = "Start Game";
+
+            deselectAllGridElements();
+        }
+
+        function exitEditMode() {
             inputs.forEach(input => {
-                input.addEventListener("input", function() {
-                    if (checkAllInputsFilled()) {
+                input.disabled = true;
+            });
+
+            radioButtons.forEach(button => {
+                button.disabled = false;
+            });
+
+            clearButton.disabled = true;
+            fillTodaysButton.disabled = true;
+            submitButton.disabled = false;
+            deselectButton.disabled = false;
+
+            guesses = [];
+            submitGuesses();
+
+            gridItems.forEach(item => item.classList.add('selectable'));
+            editButton.textContent = "Edit Board";
+        }
+    
+        clearButton.addEventListener("click", function() {
+            bestGuessesList.innerHTML = "";
+            inputs.forEach(input => input.value = "");
+            inputs[0].focus();
+            editButton.disabled = true;
+        });
+
+        deselectButton.addEventListener("click", function() {
+            deselectAllGridElements();
+        });
+    
+        editButton.addEventListener("click", function() {
+            const isEditing = !inputs[0].disabled;
+            inputs.forEach(input => {
+                input.disabled = isEditing;
+                input.classList.toggle('edit-mode', !isEditing);
+            });
+    
+            if (!isEditing) {
+                inputs[0].focus();
+                enterEditMode();
+            } else {
+                exitEditMode();
+            }
+        });
+
+        fillTodaysButton.addEventListener("click", function() {
+            fetch('/api/connections/todays_puzzle') 
+                .then(response => response.json())
+                .then(data => {
+                    let board = data["result"]
+                    if (board && board.length === 16) {
+                        inputs.forEach((input, index) => {
+                            input.value = board[index];
+                        });
                         editButton.disabled = false;
                     } else {
-                        editButton.disabled = true;
+                        console.error('Invalid response from API');
                     }
-                });
+                })
+                .catch(error => console.error('Error fetching words:', error));
+        });
+
+        function submitGuesses() {
+            const wordList = Array.from(inputs).map(input => input.value);
+
+            fetch('/api/connections', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ wordList, guesses })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const groupings = data["result"];
+
+                console.log(groupings);
+
+                bestGuessesList.innerHTML = "";
+                let numGuesses = Math.min(groupings.length, 5);
+                for (let i = 0; i < numGuesses; i++) {
+                    const guess = groupings[i];
+                    const guessItem = document.createElement("li");
+                    guessItem.textContent = guess;
+                    bestGuessesList.appendChild(guessItem);
+                }
+            })
+            .catch(error => console.error('Error fetching guess suggestions:', error));
+
+            deselectAllGridElements();
+        }
+    
+        submitButton.addEventListener("click", function() {
+            const selectedItems = document.querySelectorAll(".grid-item.selected");
+            if (selectedItems.length !== 4) return;  // Ignore clicks when not all items are selected
+
+            const grouping = Array.from(selectedItems)
+                                .map(item => item.querySelector("input").value)
+            const numGrouped = parseInt(document.querySelector('input[name="option"]:checked').value);
+            const guess = new Guess(grouping, numGrouped);
+            guesses.push(guess);
+
+            submitGuesses();
+        });
+
+        gridItems.forEach(item => {
+            item.addEventListener("click", function() {
+                if (!item.querySelector("input").disabled) return;  // Ignore clicks when in edit mode
+                if (!item.classList.contains("selectable")) return;  // Ignore clicks on non-selectable items
+
+                item.classList.toggle("selected");
+                const selectedItems = document.querySelectorAll(".grid-item.selected");
+                if (selectedItems.length === 4) {
+                    gridItems.forEach(item => {
+                        if (!item.classList.contains("selected")) {
+                            item.classList.remove("selectable");
+                        }
+                    });
+                } else {
+                    gridItems.forEach(item => {
+                        if (!item.classList.contains("selected")) {
+                            item.classList.add("selectable");
+                        }
+                    });
+                }
+            });
+        });
+
+        inputs.forEach(input => {
+            input.addEventListener("input", function() {
+                if (checkAllInputsFilled()) {
+                    editButton.disabled = false;
+                } else {
+                    editButton.disabled = true;
+                }
             });
         });
     </script>

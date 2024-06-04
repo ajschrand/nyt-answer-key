@@ -354,6 +354,25 @@ main {
 .grid-item.selected {
     background-color: #a0a0a0; /* Darker gray for selected items */
 }
+
+.radio-button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* Adjust the gap as needed */
+    margin-top: 20px; /* Adjust the top margin as needed */
+}
+
+.radio-button {
+    margin: 0 10px;
+    accent-color: #ff6f61; /* Customize the color to match your theme */
+}
+
+.radio-button + label {
+    margin-right: 20px;
+    font-size: 1.2em; /* Adjust as needed */
+    color: #333; /* Match the color to your theme */
+}
 /* ------------------------------------------------- */
 
 
