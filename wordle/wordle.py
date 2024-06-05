@@ -1,16 +1,13 @@
 import wordfreq as wf
-import json
 
 from statistics import median
 from utils.str_utils import word_has_duplicates
-from pathlib import Path
-cwd = Path(__file__).resolve().parent
+from utils.str_utils import get_wordle_answers
+from utils.str_utils import get_wordle_letter_frequencies
 
-DEFAULT_STARTING_GUESS = "crate"
-VALID_WORDLE_ANSWERS = json.load(open(f"{cwd}\\wordle_answers.txt", 'r'))
-LETTER_FREQUENCIES_ANSWERS = json.load(
-    open(f"{cwd}\\letter_frequencies.txt", 'r'))
-
+DEFAULT_STARTING_GUESS = "crane"
+VALID_WORDLE_ANSWERS = get_wordle_answers()
+LETTER_FREQUENCIES_ANSWERS = get_wordle_letter_frequencies()
 
 def play_wordle():
     """

@@ -1,3 +1,5 @@
+from json import load
+
 def get_list_grid(list, size):
     grid = ""
     line = ""
@@ -61,9 +63,13 @@ def get_menu_input(num_items):
 
 
 def get_english_words():
-    from json import load
-    from pathlib import Path
-    cwd = Path(__file__).resolve().parent
+    return load(open(f"utils/english_words.txt", 'r'))
 
-    return load(open(f"{cwd}\\english_words.txt", 'r'))
+
+def get_wordle_answers():
+    return load(open(f"utils/wordle_answers.txt", 'r'))
+
+
+def get_wordle_letter_frequencies():
+    return load(open(f"utils/wordle_letter_frequencies.txt", 'r'))
 
