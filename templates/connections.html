@@ -70,12 +70,31 @@
         const inputs = document.querySelectorAll(".grid-item input");
 
         let guesses = [];
+        let numSolutionsFound = 0;
+
+        inputs[0].focus();
 
         function deselectAllGridElements() {
             gridItems.forEach(item => {
                 item.classList.remove("selected");
-                item.classList.add("selectable");
             });
+        }
+
+        function updateGridItemSelectability() {
+            const selectedItems = Array.from(document.querySelectorAll(".grid-item.selected"));
+            for (let i = 0; i < gridItems.length; i++) {
+                if (i < numSolutionsFound * 4) {
+                    gridItems[i].classList.remove("selectable");
+                } else if (selectedItems.length === 4) {
+                    if (selectedItems.includes(gridItems[i])) {
+                        gridItems[i].classList.add("selectable");
+                    } else {
+                        gridItems[i].classList.remove("selectable");
+                    }
+                } else {
+                    gridItems[i].classList.add("selectable");
+                }
+            }
         }
 
         function checkAllInputsFilled() {
@@ -99,12 +118,14 @@
 
             clearButton.disabled = false;
             fillTodaysButton.disabled = false;
-            submitButton.disabled = true;
             deselectButton.disabled = true;
 
             gridItems.forEach(item => item.classList.remove('selectable'));
+            gridItems.forEach(item => item.classList.remove('correct'));
             editButton.textContent = "Start Game";
 
+            guesses = [];
+            numSolutionsFound = 0;
             deselectAllGridElements();
         }
 
@@ -113,16 +134,10 @@
                 input.disabled = true;
             });
 
-            radioButtons.forEach(button => {
-                button.disabled = false;
-            });
-
             clearButton.disabled = true;
             fillTodaysButton.disabled = true;
-            submitButton.disabled = false;
             deselectButton.disabled = false;
 
-            guesses = [];
             submitGuesses();
 
             gridItems.forEach(item => item.classList.add('selectable'));
@@ -185,9 +200,6 @@
             .then(response => response.json())
             .then(data => {
                 const groupings = data["result"];
-
-                console.log(groupings);
-
                 bestGuessesList.innerHTML = "";
                 let numGuesses = Math.min(groupings.length, 5);
                 for (let i = 0; i < numGuesses; i++) {
@@ -199,7 +211,13 @@
             })
             .catch(error => console.error('Error fetching guess suggestions:', error));
 
+            submitButton.disabled = true;
+            radioButtons.forEach(button => {
+                button.disabled = true;
+            });
+
             deselectAllGridElements();
+            updateGridItemSelectability();
         }
     
         submitButton.addEventListener("click", function() {
@@ -209,6 +227,30 @@
             const grouping = Array.from(selectedItems)
                                 .map(item => item.querySelector("input").value)
             const numGrouped = parseInt(document.querySelector('input[name="option"]:checked').value);
+            if (isNaN(numGrouped)) return;  // Ignore clicks when no radio button is selected
+            if (numGrouped === 0 && guesses.length === 2) {
+                numGrouped = 2;
+            }
+
+            if (numGrouped === 4) {
+                let gridItemsToSwap = Array.from(gridItems)
+                                        .slice(numSolutionsFound * 4, numSolutionsFound * 4 + 4)
+                let inputsToSwap = gridItemsToSwap.map(item => item.querySelector("input"));
+                // Swap the values of the selected items with the values of the items in the rowToSwap
+                for (let i = 0; i < selectedItems.length; i++) {
+                    // store the value of the selected item
+                    let temp = selectedItems[i].querySelector("input").value;
+                    // set the value of the selected item to the value of the item in rowToSwap
+                    selectedItems[i].querySelector("input").value = inputsToSwap[i].value;
+                    // set the value of the item in rowToSwap to the stored value
+                    inputsToSwap[i].value = temp;
+
+                    gridItemsToSwap[i].classList.add("correct")
+                }
+
+                numSolutionsFound++;
+            }
+
             const guess = new Guess(grouping, numGrouped);
             guesses.push(guess);
 
@@ -223,18 +265,18 @@
                 item.classList.toggle("selected");
                 const selectedItems = document.querySelectorAll(".grid-item.selected");
                 if (selectedItems.length === 4) {
-                    gridItems.forEach(item => {
-                        if (!item.classList.contains("selected")) {
-                            item.classList.remove("selectable");
-                        }
+                    submitButton.disabled = false;
+                    radioButtons.forEach(button => {
+                        button.disabled = false;
                     });
                 } else {
-                    gridItems.forEach(item => {
-                        if (!item.classList.contains("selected")) {
-                            item.classList.add("selectable");
-                        }
+                    submitButton.disabled = true;
+                    radioButtons.forEach(button => {
+                        button.disabled = true;
                     });
                 }
+
+                updateGridItemSelectability();
             });
         });
 

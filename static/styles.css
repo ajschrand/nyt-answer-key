@@ -355,6 +355,10 @@ main {
     background-color: #a0a0a0; /* Darker gray for selected items */
 }
 
+.grid-item.correct {
+    background-color: rgb(71, 218, 71);
+}
+
 .radio-button-container {
     display: flex;
     align-items: center;
