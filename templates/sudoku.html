@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">Back</button>
+    <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">&lt;</button>
+    <button data-popup="help-popup" class="help-button">?</button>
     <header>
         <h1>Sudoku</h1>
     </header>
@@ -37,9 +38,56 @@
             </div>
         </div>
 
+        <!-- Popup Windows -->
+        <div id="help-popup" class="popup hidden">
+            <div class="popup-content">
+                <span class="close-popup">&times;</span>
+                <h2>How To Use</h2>
+                <p>
+                    <ol>
+                        <li>
+                            Fill in the Sudoku grid with the starting numbers by doing one of the following:
+                            <ul>
+                                <li>Press the "Fill Today's Easy/Medium/Hard" button to get today's sudoku puzzle of the selected difficulty.</li>
+                                <li>Press the squares and type the numbers using your keyboard.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Solve the puzzle by doing one of the following:
+                            <ul>
+                                <li>Press the "Solve" button to solve the puzzle.</li>
+                                <li>Press a square and then press the "Hint" button to get the correct number for the selected cell.</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </p>
+            </div>
+        </div>
     </main>
     <footer class="footer"></footer>
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const link = document.querySelector('.help-button');
+            const popup = document.querySelector('.popup');
+            const closePopup = popup.querySelector('.close-popup');
+    
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                popup.classList.remove('hidden');
+            });
+    
+            closePopup.addEventListener('click', () => {
+                popup.classList.add('hidden');
+            });
+
+            // Close the popup when clicking outside of the content
+            window.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.classList.add('hidden');
+                }
+            });
+        });
+
         const cells = document.querySelectorAll('td input');
         let selectedCell = cells[0];
         let selectedCellIndex = 0;

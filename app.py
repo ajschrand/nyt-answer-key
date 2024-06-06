@@ -1,10 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 from random import shuffle
-import spacy
 
 from spelling_bee.spelling_bee import auto_spelling_bee
 from wordle.wordle import generate_guesses
-from connections.connections import find_best_guess_groupings
+from connections.connections import find_remaining_groupings
 from sudoku.sudoku import auto_sudoku
 from letter_boxed.letter_boxed import auto_letter_boxed
 
@@ -14,7 +13,6 @@ from utils.scraping_utils import connections_data
 from utils.scraping_utils import letter_boxed_data
 
 app = Flask(__name__)
-nlp = spacy.load("en_core_web_sm")
 
 @app.route('/')
 def index():
@@ -97,10 +95,10 @@ def api_sudoku_hard():
 @app.route('/api/connections', methods=['POST'])
 def api_connections():
     data = request.get_json()
-    word_list = data.get('wordList')
+    board = data.get('board')
     guesses = data.get('guesses')
-    top_5_groupings = find_best_guess_groupings(word_list, guesses, nlp)
-    result = top_5_groupings
+    remaining_groupings = find_remaining_groupings(board, guesses)
+    result = remaining_groupings
     return jsonify(result=result)
 
 # API endpoint for getting today's connections puzzle

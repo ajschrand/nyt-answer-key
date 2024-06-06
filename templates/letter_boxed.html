@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">Back</button>
+    <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">&lt;</button>
+    <button data-popup="help-popup" class="help-button">?</button>
     <header>
         <h1>Letter Boxed</h1>
     </header>
@@ -29,6 +30,26 @@
                 <button class="action-button" id="clearButton">Clear</button>
                 <button class="action-button" id="todaysPuzzleButton">Fill Today's Puzzle</button>
                 <button class="action-button" id="solveButton" disabled>Solve</button>
+            </div>
+        </div>
+
+        <!-- Popup Windows -->
+        <div id="help-popup" class="popup hidden">
+            <div class="popup-content">
+                <span class="close-popup">&times;</span>
+                <h2>How To Use</h2>
+                <p>
+                    <ol>
+                        <li>
+                            Input the letters from the sides into the text boxes by doing one of the following:
+                            <ul>
+                                <li>Press the "Fill Today's Puzzle" button to get the letters for today's Letter Boxed puzzle.</li>
+                                <li>Press the input boxes under "Input Sides" and type the letters using your keyboard.</li>
+                            </ul>
+                        </li>
+                        <li>Press the "Solve" button to display all the answers sorted by length.</li>
+                    </ol>
+                </p>
             </div>
         </div>
     </main>
@@ -57,8 +78,27 @@
         let positions = [];
         
         document.addEventListener('DOMContentLoaded', () => {
+            const link = document.querySelector('.help-button');
+            const popup = document.querySelector('.popup');
+            const closePopup = popup.querySelector('.close-popup');
+    
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                popup.classList.remove('hidden');
+            });
+    
+            closePopup.addEventListener('click', () => {
+                popup.classList.add('hidden');
+            });
+
+            // Close the popup when clicking outside of the content
+            window.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.classList.add('hidden');
+                }
+            });
+
             const ctx = canvas.getContext('2d');
-        
             const canvasWidth = canvas.width;
             const canvasHeight = canvas.height;
             const squareSize = canvasWidth / 4; // Adjust as needed

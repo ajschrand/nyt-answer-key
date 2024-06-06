@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">Back</button>
+    <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">&lt;</button>
+    <button data-popup="help-popup" class="help-button">?</button>
     <header>
         <h1>Spelling Bee</h1>
     </header>
@@ -25,13 +26,35 @@
                 </div>
                 <h2>Answers</h2>
                 <div class="word-list-container">
-                    <ul class="word-list" id="wordList"></ul>
+                    <ul class="word-list" id="wordList">
+                        <!-- Words will be added here -->
+                    </ul>
                 </div>
                 <div class="button-container">
                     <button class="action-button" id="clearButton">Clear</button>
                     <button class="action-button" id="todaysPuzzleButton">Fill Today's Puzzle</button>
                     <button class="action-button" id="solveButton" disabled>Solve</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Popup Windows -->
+        <div id="help-popup" class="popup hidden">
+            <div class="popup-content">
+                <h2>How To Use</h2>
+                <span class="close-popup">&times;</span>
+                <p>
+                    <ol>
+                        <li>
+                            Input the letters from the hexagons into the text boxes by doing one of the following:
+                            <ul>
+                                <li>Press the "Fill Today's Puzzle" button to get the letters for today's Spelling Bee puzzle.</li>
+                                <li>Type the letters using your computer's keyboard or the on-screen keyboard.</li>
+                            </ul>
+                        </li>
+                        <li>Press the "Solve" button to display all the answers sorted by score.</li>
+                    </ol>
+                </p>
             </div>
         </div>
     </main>
@@ -79,6 +102,28 @@
     </footer>
     <footer class="footer"></footer>
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const link = document.querySelector('.help-button');
+            const popup = document.querySelector('.popup');
+            const closePopup = popup.querySelector('.close-popup');
+    
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                popup.classList.remove('hidden');
+            });
+    
+            closePopup.addEventListener('click', () => {
+                popup.classList.add('hidden');
+            });
+
+            // Close the popup when clicking outside of the content
+            window.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.classList.add('hidden');
+                }
+            });
+        });
+
         const hexagons = document.querySelectorAll('.hexagon');
         const solveButton = document.getElementById('solveButton');
         let currentHexagonIndex = 0;

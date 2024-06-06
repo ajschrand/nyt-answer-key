@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">Back</button>
+    <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">&lt;</button>
+    <button data-popup="help-popup" class="help-button">?</button>
     <header>
         <h1>Connections</h1>
     </header>
@@ -20,11 +21,11 @@
                 </div>
                 {% endfor %}
             </div>
-            <div id="best-guesses-container">
-                <h2>Best Guesses</h2>
-                <ol id="best-guesses-list">
-                    <li>Guesses will appear here!</li>
-                </ol>
+            <h2>Available Guesses</h2>
+            <div class="word-list-container">
+                <ul class="word-list" id="word-list">
+                    <!-- Words will be added here -->
+                </ul>
             </div>
             <div class="button-container">
                 <button class="action-button" id="fillTodaysButton">Fill Today's Puzzle</button>
@@ -35,7 +36,6 @@
                 <button class="action-button" id="editButton" disabled>Start Game</button>
             </div>
             <div class="radio-button-container">
-                <button class="action-button" id="submitButton" disabled >Submit Guess</button>
                 <label>
                     <input type="radio" name="option" value="0" class="radio-button" disabled checked>Wrong
                 </label>
@@ -45,11 +45,68 @@
                 <label>
                     <input type="radio" name="option" value="4" class="radio-button" disabled>Correct
                 </label>
+                <button class="action-button" id="submitButton" disabled >Submit Guess</button>
+            </div>
+        </div>
+
+        <!-- Popup Windows -->
+        <div id="help-popup" class="popup hidden">
+            <div class="popup-content">
+                <span class="close-popup">&times;</span>
+                <h2>How To Use</h2>
+                <p>
+                    <ol>
+                        <li>
+                            Input the words from the grid into the text boxes by doing one of the following:
+                            <ul>
+                                <li>Click the "Fill Today's Puzzle" button to get the words for today's Connections puzzle.</li>
+                                <li>Press each box and type the words into it and using your keyboard.</li>
+                            </ul>
+                        </li>
+                        <li>Click the "Start Game" button.</li>
+                        <li>
+                            Press the boxes to select your guess. 
+                            The "Available Guesses" list will display guesses that both contain all the selected words and haven't been ruled out by previous guesses.
+                        </li>
+                        <li>
+                            Once you have selected four words, choose the radio button that corresponds to the correctness of your guess.
+                        </li>
+                        <li>
+                            Click the "Submit Guess" button to submit your guess and see the updated list of available guesses.
+                            If you submitted a correct guess, the words you selected will be moved to the top of the board and marked in green to indicate they are correct.
+                        </li>
+                        <li>
+                            Repeat steps 3-5 until you have found all the correct connections.
+                        </li>
+                    </ol>
+                </p>
             </div>
         </div>
     </main>
     <footer class="footer"></footer>
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const link = document.querySelector('.help-button');
+            const popup = document.querySelector('.popup');
+            const closePopup = popup.querySelector('.close-popup');
+    
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                popup.classList.remove('hidden');
+            });
+    
+            closePopup.addEventListener('click', () => {
+                popup.classList.add('hidden');
+            });
+
+            // Close the popup when clicking outside of the content
+            window.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.classList.add('hidden');
+                }
+            });
+        });
+
         class Guess {
             constructor(grouping, numGrouped) {
                 this.grouping = grouping;
@@ -64,11 +121,12 @@
         const submitButton = document.getElementById("submitButton");
 
         const radioButtons = document.querySelectorAll(".radio-button");
-        const bestGuessesList = document.getElementById("best-guesses-list");
+        const wordList = document.getElementById("word-list");
 
         const gridItems = document.querySelectorAll(".grid-item");
         const inputs = document.querySelectorAll(".grid-item input");
 
+        let availableGroupings = [];
         let guesses = [];
         let numSolutionsFound = 0;
 
@@ -78,6 +136,8 @@
             gridItems.forEach(item => {
                 item.classList.remove("selected");
             });
+
+            updateGridItemSelectability();
         }
 
         function updateGridItemSelectability() {
@@ -94,6 +154,27 @@
                 } else {
                     gridItems[i].classList.add("selectable");
                 }
+            }
+        }
+
+        function updateWordList() {
+            // For each guess in availableGroupings, check if all selected items are in the guess
+            // If they are, add the guess to the wordList
+            const selectedItems = Array.from(document.querySelectorAll(".grid-item.selected"));
+            
+            wordList.innerHTML = "";
+            availableGroupings.forEach(grouping => {
+                if (selectedItems.every(item => grouping.includes(item.querySelector("input").value))) {
+                    const li = document.createElement("li");
+                    li.textContent = grouping.join(", ");
+                    wordList.appendChild(li);
+                }
+            });
+
+            if (wordList.children.length === 0) {
+                const li = document.createElement("li");
+                li.textContent = "This guess was ruled out.";
+                wordList.appendChild(li);
             }
         }
 
@@ -143,9 +224,40 @@
             gridItems.forEach(item => item.classList.add('selectable'));
             editButton.textContent = "Edit Board";
         }
+
+        function submitGuesses() {
+            const board = Array.from(inputs).map(input => input.value);
+
+            fetch('/api/connections', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ board, guesses })
+            })
+            .then(response => response.json())
+            .then(data => {
+                availableGroupings = data["result"];
+                wordList.innerHTML = "";
+                availableGroupings.forEach(grouping => {
+                    const li = document.createElement("li");
+                    li.textContent = grouping.join(", ");
+                    wordList.appendChild(li);
+                });
+            })
+            .catch(error => console.error('Error fetching guess suggestions:', error));
+
+            submitButton.disabled = true;
+            radioButtons.forEach(button => {
+                button.disabled = true;
+            });
+
+            deselectAllGridElements();
+            updateGridItemSelectability();
+        }
     
         clearButton.addEventListener("click", function() {
-            bestGuessesList.innerHTML = "";
+            wordList.innerHTML = "";
             inputs.forEach(input => input.value = "");
             inputs[0].focus();
             editButton.disabled = true;
@@ -153,6 +265,7 @@
 
         deselectButton.addEventListener("click", function() {
             deselectAllGridElements();
+            updateWordList();
         });
     
         editButton.addEventListener("click", function() {
@@ -186,39 +299,6 @@
                 })
                 .catch(error => console.error('Error fetching words:', error));
         });
-
-        function submitGuesses() {
-            const wordList = Array.from(inputs).map(input => input.value);
-
-            fetch('/api/connections', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ wordList, guesses })
-            })
-            .then(response => response.json())
-            .then(data => {
-                const groupings = data["result"];
-                bestGuessesList.innerHTML = "";
-                let numGuesses = Math.min(groupings.length, 5);
-                for (let i = 0; i < numGuesses; i++) {
-                    const guess = groupings[i];
-                    const guessItem = document.createElement("li");
-                    guessItem.textContent = guess;
-                    bestGuessesList.appendChild(guessItem);
-                }
-            })
-            .catch(error => console.error('Error fetching guess suggestions:', error));
-
-            submitButton.disabled = true;
-            radioButtons.forEach(button => {
-                button.disabled = true;
-            });
-
-            deselectAllGridElements();
-            updateGridItemSelectability();
-        }
     
         submitButton.addEventListener("click", function() {
             const selectedItems = document.querySelectorAll(".grid-item.selected");
@@ -238,11 +318,8 @@
                 let inputsToSwap = gridItemsToSwap.map(item => item.querySelector("input"));
                 // Swap the values of the selected items with the values of the items in the rowToSwap
                 for (let i = 0; i < selectedItems.length; i++) {
-                    // store the value of the selected item
                     let temp = selectedItems[i].querySelector("input").value;
-                    // set the value of the selected item to the value of the item in rowToSwap
                     selectedItems[i].querySelector("input").value = inputsToSwap[i].value;
-                    // set the value of the item in rowToSwap to the stored value
                     inputsToSwap[i].value = temp;
 
                     gridItemsToSwap[i].classList.add("correct")
@@ -263,7 +340,7 @@
                 if (!item.classList.contains("selectable")) return;  // Ignore clicks on non-selectable items
 
                 item.classList.toggle("selected");
-                const selectedItems = document.querySelectorAll(".grid-item.selected");
+                const selectedItems = Array.from(document.querySelectorAll(".grid-item.selected"));
                 if (selectedItems.length === 4) {
                     submitButton.disabled = false;
                     radioButtons.forEach(button => {
@@ -277,6 +354,7 @@
                 }
 
                 updateGridItemSelectability();
+                updateWordList();
             });
         });
 

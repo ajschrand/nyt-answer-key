@@ -15,6 +15,9 @@ class Grouping:
         
     def __lt__(self, other):
         return self.similarity < other.similarity
+    
+    def __contains__(self, word):
+        return word in self.words
 
     def __repr__(self):
         return f"{self.words} - {self.similarity}"
@@ -24,7 +27,7 @@ class Grouping:
         for i in range(len(self.words)):
             res += self.words[i]
             if i != len(self.words) - 1:
-                res += " "
+                res += ", "
                 
         return res
 
@@ -141,7 +144,7 @@ def process_guess_input(guess_input):
     return guess, num_grouped
 
 
-def get_mgs(groupings, nlp=spacy.load("en_core_web_md")):
+def get_mgs(groupings):
     """
     Calculates the median of the semantic similarities of all pairs of words
     in a grouping for all groupings in the input list
@@ -152,6 +155,8 @@ def get_mgs(groupings, nlp=spacy.load("en_core_web_md")):
     Returns:
         Dict: The median semantic similarity for each grouping
     """
+    nlp=spacy.load("en_core_web_md")
+    
     mgs = []
     # Cache for word pair similarities to mitigate duplicate calculations
     pair_similarities = {}
@@ -193,7 +198,7 @@ def is_grouping_valid_for_guess(grouping, guess, num_grouped):
     """
     count = 0
     for word in guess:
-        if word in grouping.words:
+        if word in grouping:
             count += 1
 
     if num_grouped == 4:
@@ -233,21 +238,10 @@ def is_grouping_valid_for_guess_info(grouping, guess_info):
     return True
 
 
-def find_best_guess_groupings(word_list, guess_info, nlp):
-    import heapq
-    
-    g = get_mgs(distinct_combinations(word_list, 4), nlp)
-    top_five_groupings = []
-    heapq.heapify(top_five_groupings)
-    
-    for grouping in g:
-        if not is_grouping_valid_for_guess_info(grouping, guess_info):
-            continue
-        
-        if len(top_five_groupings) < 5:
-            heapq.heappush(top_five_groupings, grouping)
-        elif grouping.similarity > top_five_groupings[0].similarity:
-            heapq.heappushpop(top_five_groupings, grouping)
-        
-    return [str(grouping) for grouping in heapq.nlargest(5, top_five_groupings)]
-
+def find_remaining_groupings(board, guess_info):
+    g = distinct_combinations(board, 4)
+    return [
+        grouping
+        for grouping in g
+        if is_grouping_valid_for_guess_info(grouping, guess_info)
+    ]
