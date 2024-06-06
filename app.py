@@ -3,7 +3,7 @@ from random import shuffle
 
 from spelling_bee.spelling_bee import auto_spelling_bee
 from wordle.wordle import generate_guesses
-from connections.connections import reduce_all_guesses
+from connections.connections import find_best_guess_groupings
 from sudoku.sudoku import auto_sudoku
 from letter_boxed.letter_boxed import auto_letter_boxed
 
@@ -97,8 +97,8 @@ def api_connections():
     data = request.get_json()
     word_list = data.get('wordList')
     guesses = data.get('guesses')
-    remaining_groupings = reduce_all_guesses(word_list, guesses)
-    result = list(remaining_groupings.keys())
+    top_5_groupings = find_best_guess_groupings(word_list, guesses)
+    result = top_5_groupings
     return jsonify(result=result)
 
 # API endpoint for getting today's connections puzzle
