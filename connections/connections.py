@@ -239,14 +239,16 @@ def find_best_guess_groupings(word_list, guess_info):
     import heapq
     
     g = get_mgs(distinct_combinations(word_list, 4))
-    top_five_groupings = g[:5]
+    top_five_groupings = []
     heapq.heapify(top_five_groupings)
     
     for grouping in g:
         if not is_grouping_valid_for_guess_info(grouping, guess_info):
             continue
         
-        if grouping.similarity > top_five_groupings[0].similarity:
+        if len(top_five_groupings) < 5:
+            heapq.heappush(top_five_groupings, grouping)
+        elif grouping.similarity > top_five_groupings[0].similarity:
             heapq.heappushpop(top_five_groupings, grouping)
         
     return [str(grouping) for grouping in heapq.nlargest(5, top_five_groupings)]
