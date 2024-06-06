@@ -14,7 +14,7 @@ from utils.scraping_utils import connections_data
 from utils.scraping_utils import letter_boxed_data
 
 app = Flask(__name__)
-nlp = spacy.load("en_core_web_md")
+nlp = spacy.load("en_core_web_sm")
 
 @app.route('/')
 def index():
