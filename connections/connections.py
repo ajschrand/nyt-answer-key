@@ -141,7 +141,7 @@ def process_guess_input(guess_input):
     return guess, num_grouped
 
 
-def get_mgs(groupings):
+def get_mgs(groupings, nlp=spacy.load("en_core_web_md")):
     """
     Calculates the median of the semantic similarities of all pairs of words
     in a grouping for all groupings in the input list
@@ -152,8 +152,6 @@ def get_mgs(groupings):
     Returns:
         Dict: The median semantic similarity for each grouping
     """
-    nlp = spacy.load("en_core_web_md")
-
     mgs = []
     # Cache for word pair similarities to mitigate duplicate calculations
     pair_similarities = {}
@@ -235,10 +233,10 @@ def is_grouping_valid_for_guess_info(grouping, guess_info):
     return True
 
 
-def find_best_guess_groupings(word_list, guess_info):
+def find_best_guess_groupings(word_list, guess_info, nlp):
     import heapq
     
-    g = get_mgs(distinct_combinations(word_list, 4))
+    g = get_mgs(distinct_combinations(word_list, 4), nlp)
     top_five_groupings = []
     heapq.heapify(top_five_groupings)
     

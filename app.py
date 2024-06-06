@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from random import shuffle
+import spacy
 
 from spelling_bee.spelling_bee import auto_spelling_bee
 from wordle.wordle import generate_guesses
@@ -13,6 +14,7 @@ from utils.scraping_utils import connections_data
 from utils.scraping_utils import letter_boxed_data
 
 app = Flask(__name__)
+nlp = spacy.load("en_core_web_md")
 
 @app.route('/')
 def index():
@@ -97,7 +99,7 @@ def api_connections():
     data = request.get_json()
     word_list = data.get('wordList')
     guesses = data.get('guesses')
-    top_5_groupings = find_best_guess_groupings(word_list, guesses)
+    top_5_groupings = find_best_guess_groupings(word_list, guesses, nlp)
     result = top_5_groupings
     return jsonify(result=result)
 
