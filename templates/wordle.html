@@ -28,11 +28,11 @@
             <div id="best-guesses-container">
                 <h2>Best Guesses</h2>
                 <ol id="best-guesses-list">
-                    <li>crane</li>
-                    <li>slate</li>
                     <li>trace</li>
                     <li>crate</li>
-                    <li>caret</li>
+                    <li>slate</li>
+                    <li>least</li>
+                    <li>react</li>
                 </ol>
             </div>
             <button class="action-button" id="clearButton">Clear</button>
@@ -131,7 +131,7 @@
         let currentBoxIndex = 0;
         let guessInfo = {};
 
-        const initialBestGuesses = ['crane', 'slate', 'trace', 'crate', 'caret'];
+        const initialBestGuesses = ['trace', 'crate', 'slate', 'least', 'react'];
     
         document.querySelectorAll('.key').forEach(key => {
             key.addEventListener('click', () => {
