@@ -69,7 +69,3 @@ def get_english_words():
 def get_wordle_answers():
     return load(open(f"utils/wordle_answers.txt", 'r'))
 
-
-def get_wordle_letter_frequencies():
-    return load(open(f"utils/wordle_letter_frequencies.txt", 'r'))
-

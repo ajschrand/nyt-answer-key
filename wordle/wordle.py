@@ -1,13 +1,9 @@
-import wordfreq as wf
-
-from statistics import median
+from collections import defaultdict
 from utils.str_utils import word_has_duplicates
 from utils.str_utils import get_wordle_answers
-from utils.str_utils import get_wordle_letter_frequencies
 
-DEFAULT_STARTING_GUESS = "crane"
+DEFAULT_STARTING_GUESS = "slate"
 VALID_WORDLE_ANSWERS = get_wordle_answers()
-LETTER_FREQUENCIES_ANSWERS = get_wordle_letter_frequencies()
 
 def play_wordle():
     """
@@ -99,11 +95,8 @@ def generate_guesses(guess_info, words=VALID_WORDLE_ANSWERS):
         optimized = optimize_words(guesses, 0)
         return optimized
     
-    last_guess = list(guess_info.keys())[-1]
-    letters_known = sum([1 for num in guess_info[last_guess] if num != 0])
-
     guesses = find_possible_words(guess_info, words)
-    guesses = optimize_words(guesses, letters_known)
+    guesses = optimize_words(guesses)
 
     return guesses
 
@@ -178,11 +171,10 @@ def find_possible_words(guess_info, words):
     return possible_words
 
 
-def optimize_words(words, letters_known):
+def optimize_words(words):
     """
     Optimize the choice of word based on the information gathered so far and the current amount of information
-    If the latest guess does not have much information, prioritize words with high letter frequencies
-    If the latest guess has a lot of information, prioritize words with high word frequencies
+    Prioritize words with high letter frequencies
 
     Args:
         words (List): The words to optimize
@@ -191,52 +183,33 @@ def optimize_words(words, letters_known):
     Returns:
         List: The optimized words
     """
-    optimized = []
-    if letters_known < 3:
-        optimized = sorted(words, key=get_letter_freq, reverse=True)
-    else:
-        optimized = sorted(words, key=get_word_freq, reverse=True)
+    letter_frequencies_all = defaultdict(lambda: defaultdict(int))
+    for word in words:
+        for i, letter in enumerate(word):
+            letter_frequencies_all[i][letter] += 1
+    
+    def get_letter_freq(word):
+        """
+        Assign a score to a word based on the frequency of its letters
+        Used as a comparison function for sorting guesses
 
-    return optimized
+        Args:
+            word (String): The word to score
 
+        Returns:
+            float: The score of the word
+        """
+        score = 0
+        for i, letter in enumerate(word):
+            score += letter_frequencies_all[i][letter]
 
+        if word_has_duplicates(word):
+            score *= 0.87
 
-def get_letter_freq(word):
-    """
-    Assign a score to a word based on the frequency of its letters
-    Used as a comparison function for sorting guesses
-
-    Args:
-        word (String): The word to score
-
-    Returns:
-        float: The score of the word
-    """
-    letter_frequencies = []
-    for i, letter in enumerate(word):
-        letter_frequencies.append(LETTER_FREQUENCIES_ANSWERS[str(i)][letter])
-
-    score = median(letter_frequencies)
-
-    if word_has_duplicates(word):
-        score *= 0.5
-
-    return score
-
-
-def get_word_freq(word):
-    """
-    Assign a score to a word based on the frequency of the word itself
-    Used as a comparison function for sorting guesses
-
-    Args:
-        word (String): The word to score
-
-    Returns:
-        float: The score of the word
-    """
-    return wf.word_frequency(word, 'en')
-
+        return score
+    
+    return sorted(words, key=get_letter_freq, reverse=True)
+    
 
 def give_clues(wordle, guess):
     """

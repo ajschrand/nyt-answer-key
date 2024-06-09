@@ -22,9 +22,7 @@ Wordle is a game where players try to guess a 5-letter word -- the Wordle -- in 
  - Yellow letters are in the Wordle but are not in the correct position in the guess
  - Black letters are not in the Wordle
 
-The Wordle solver starts with a list of all valid Wordle answers and makes or suggests guesses from it until the puzzle is solved, pruning the list of now-invalid words after each guess. The way it determines its next guess depends on the amount of information (total number of yellow and green letters) it currently has:
- - If the solver knows 2 or fewer letters, it makes the guess that maximizes the fequencies of appearances of letters in their respective positions in the list of Wordle answers. For example, 's' is the most common first letter in the list of Wordle answers, so the solver would prefer answers that start with 's', given that they are valid with respect to any previously made guesses.
- - If the solver knows 3 or more letters, it makes the guess that is the most frequently used word from among the remaining choices. It does this by referencing the `wordfreq` library.
+The Wordle solver starts with a list of all valid Wordle answers and makes or suggests guesses from it until the puzzle is solved, pruning the list of now-invalid words after each guess. It suggests guesses that maximize the fequencies of appearances of letters in their respective positions in the pruned list of Wordle answers. For example, 's' is the most common first letter in the list of Wordle answers, so the solver would prefer answers that start with 's', given that they are valid with respect to any previously made guesses.
 
 ## Connections
 
