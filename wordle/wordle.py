@@ -2,8 +2,9 @@ from collections import defaultdict
 from utils.str_utils import word_has_duplicates
 from utils.str_utils import get_wordle_answers
 
-DEFAULT_STARTING_GUESS = "slate"
+DEFAULT_STARTING_GUESS = "trace"
 VALID_WORDLE_ANSWERS = get_wordle_answers()
+
 
 def play_wordle():
     """
@@ -94,7 +95,7 @@ def generate_guesses(guess_info, words=VALID_WORDLE_ANSWERS):
         guesses = find_possible_words({}, words)
         optimized = optimize_words(guesses, 0)
         return optimized
-    
+
     guesses = find_possible_words(guess_info, words)
     guesses = optimize_words(guesses)
 
@@ -112,7 +113,7 @@ def find_possible_words(guess_info, words):
     Returns:
         List: The list of possible words
     """
-    
+
     def do_greens_match(word, greens):
         for i in range(5):
             if greens[i] == '_':
@@ -187,7 +188,7 @@ def optimize_words(words):
     for word in words:
         for i, letter in enumerate(word):
             letter_frequencies_all[i][letter] += 1
-    
+
     def get_letter_freq(word):
         """
         Assign a score to a word based on the frequency of its letters
@@ -207,9 +208,9 @@ def optimize_words(words):
             score *= 0.87
 
         return score
-    
+
     return sorted(words, key=get_letter_freq, reverse=True)
-    
+
 
 def give_clues(wordle, guess):
     """
@@ -225,7 +226,7 @@ def give_clues(wordle, guess):
     Returns:
         List: The info list
     """
-    
+
     word_list = list(wordle)
     info_list = [0] * 5
 

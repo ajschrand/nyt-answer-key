@@ -37,10 +37,10 @@ def connections_data():
     today = datetime.today().strftime("%d-%m-%y")
     # Having this string on multiple lines breaks Render's deployment for some reason
     # So keep it on one line, despite the PEP8 violation
-    link = f"https://www.rockpapershotgun.com/wordle-connections-hint-and-answer-{today}"
+    link = f"https://www.rockpapershotgun.com/connections-hint-and-answers-{today}"
     s = get_soup(link)
     answers_header = s.find(string=re.compile(
-        r"What is the answer to Connections today"))
+        r"What are today's Connections answers?"))
     answers_list = answers_header.find_next('ul')
     answers_tags = answers_list.find_all('li')
 

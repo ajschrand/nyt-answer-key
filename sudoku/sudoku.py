@@ -1,6 +1,7 @@
 from colorama import Fore
 from copy import deepcopy
 
+
 class SudokuBoard:
     """
     Represents a Sudoku board and provides functionality to solve it.
@@ -14,7 +15,7 @@ class SudokuBoard:
         solve(board, i=0, j=0): Recursive helper function for solveSudoku().
         __str__(): Returns a string representation of the solved board with color-coded values.
     """
-    
+
     def __init__(self, board):
         """
         Initializes a SudokuBoard object.
@@ -23,7 +24,8 @@ class SudokuBoard:
             board (list[list[int]]): A 9x9 2D list representing the initial Sudoku board.
         """
         self.initial_board = board
-        self.solved_board = deepcopy(board)  # Deep copy to avoid modifying original board
+        # Deep copy to avoid modifying original board
+        self.solved_board = deepcopy(board)
 
     def solve_sudoku(self):
         """
@@ -50,12 +52,12 @@ class SudokuBoard:
                         return x, y
 
             return -1, -1
-        
+
         def is_valid_num(board, i, j, e):
             for x in range(9):
                 if board[i][x] == e:
                     return False
-            
+
             for x in range(9):
                 if board[x][j] == e:
                     return False
@@ -68,7 +70,7 @@ class SudokuBoard:
                         return False
 
             return True
-        
+
         i, j = find_next_blank_Cell(board)
         if i == -1:
             return True
@@ -79,7 +81,7 @@ class SudokuBoard:
                 if self.solve(board, i, j):
                     return True  # Solution found
                 board[i][j] = 0  # Backtrack
-                
+
         return False
 
     def __str__(self) -> str:
@@ -99,25 +101,21 @@ class SudokuBoard:
                     line += f"{num} "
             board_str += line + "\n"
         return board_str.strip()
-    
-    
-def play_sudoku():
+
+
+def solve_sudoku(board):
     """
-    Play a game of Sudoku by inputting the initial board state.
+    Solve a Sudoku board using backtracking.
+    Prints the solution if found, otherwise prints "No solution found."
+
+    Args:
+        board (List): A 9x9 2D list representing the initial Sudoku board.
     """
-    print("Enter the sudoku board one line at a time")
-    print("A line e.g. '100030058'")
-    
-    board = []
-    for _ in range(9):
-        input_str = input()
-        if input_str == "q":
-            return
-        
-        board.append([int(char) for char in input_str])
-    
-    solution = auto_sudoku(board)
-    print(solution)
+    s = SudokuBoard(board)
+    if s.solve_sudoku():
+        print(s)
+    else:
+        print("No solution found.")
 
 
 def auto_sudoku(board):
@@ -126,12 +124,30 @@ def auto_sudoku(board):
 
     Args:
         board (List): A 9x9 2D list representing the initial Sudoku board.
-        
+
     Returns:
         List: A 9x9 2D list representing the solved Sudoku board.
     """
     s = SudokuBoard(board)
     if s.solve_sudoku():
         return s.solved_board
-    
+
     return None
+
+
+def play_sudoku():
+    """
+    Play a game of Sudoku by inputting the initial board state.
+    """
+    print("Enter the sudoku board one line at a time")
+    print("A line e.g. '100030058'")
+
+    board = []
+    for _ in range(9):
+        input_str = input()
+        if input_str == "q":
+            return
+
+        board.append([int(char) for char in input_str])
+
+    solve_sudoku(board)
