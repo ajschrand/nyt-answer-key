@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solver</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>NYT Solver</h1>
+    </header>
+    <main>
+        <section class="games-list">
+            <button class="game-button" onclick="window.location.href='{{ url_for('spelling_bee') }}'">Spelling Bee</button>
+            <button class="game-button" onclick="window.location.href='{{ url_for('wordle') }}'">Wordle</button>
+            <button class="game-button" onclick="window.location.href='{{ url_for('connections') }}'">Connections</button>
+            <button class="game-button" onclick="window.location.href='{{ url_for('sudoku') }}'">Sudoku</button>
+            <button class="game-button" onclick="window.location.href='{{ url_for('letter_boxed') }}'">Letter Boxed</button>
+        </section>
+    </main>
+    <footer class="footer">
+        <a href="#github" class="footer-link" data-popup="github-popup">GitHub</a>
+        <a href="#about" class="footer-link" data-popup="about-popup">About</a>
+        <a href="#coffee" class="footer-link" data-popup="coffee-popup">Buy Me a Coffee</a>
+    </footer>
+
+    <!-- Popup Windows -->
+    <div id="github-popup" class="popup hidden">
+        <div class="popup-content">
+            <span class="close-popup">&times;</span>
+            <h2>GitHub</h2>
+            <p>
+                Check out the source code and README on GitHub using the link below. Contributions and feedback are welcome!
+                <br>
+                <a href="https://github.com/ajschrand/nyt-games/" target="_blank">ajschrand/nyt-games</a>
+                <br>
+                <br>
+                Also see these similar projects that inspired this app:
+                <br>
+                <a href="https://letterboxed.aliceyliang.com/" target="_blank">Letter Boxed Solver</a>
+                <br>
+                <a href="https://sadmoody.github.io/unwordle/" target="_blank">Wordle Solver</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="about-popup" class="popup hidden">
+        <div class="popup-content">
+            <span class="close-popup">&times;</span>
+            <h2>About</h2>
+            <p>
+                This app implements automated solvers for a variety of games in the New York Times collection, 
+                including Spelling Bee, Wordle, Connections, Sudoku, and Letter Boxed.
+                <br>
+                <br>
+                It was created by Adam Schrand as a personal project to practice web development skills and
+                to provide a convenient way to solve these games. The app is not affiliated with the New York Times.
+                <br>
+                <br>
+                If you have any questions or feedback, feel free to reach out to me by email at
+                <a href="mailto:adam.schrand@gmail.com">adam.schrand@gmail.com</a>.
+            </p>
+        </div>
+    </div>
+
+    <div id="coffee-popup" class="popup hidden">
+        <div class="popup-content">
+            <span class="close-popup">&times;</span>
+            <h2>Buy Me a Coffee</h2>
+            <p>
+                If you find this app helpful and would like to support its development, 
+                you can buy me a coffee using the link below. Thank you!
+                <br>
+                <br>
+                <a href="https://www.buymeacoffee.com/ajschrand" target="_blank">www.buymeacoffee.com/ajschrand</a>
+            </p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            function initializePopup(linkSelector, popupId) {
+                const link = document.querySelector(linkSelector);
+                const popup = document.getElementById(popupId);
+                const closePopup = popup.querySelector('.close-popup');
+        
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    popup.classList.remove('hidden');
+                });
+        
+                closePopup.addEventListener('click', () => {
+                    popup.classList.add('hidden');
+                });
+        
+                // Close the popup when clicking outside of the content
+                window.addEventListener('click', (e) => {
+                    if (e.target === popup) {
+                        popup.classList.add('hidden');
+                    }
+                });
+            }
+        
+            // Initialize popups for each link
+            initializePopup('a[data-popup="about-popup"]', 'about-popup');
+            initializePopup('a[data-popup="github-popup"]', 'github-popup');
+            initializePopup('a[data-popup="coffee-popup"]', 'coffee-popup');
+        });
+    </script>
+</body>
+</html>

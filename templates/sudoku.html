@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">&lt;</button>
+    <button data-popup="help-popup" class="help-button">?</button>
+    <header>
+        <h1>Sudoku</h1>
+    </header>
+    <main>
+        <div class="game-content">
+            <table>
+                <!-- Generate the 9x9 Sudoku grid using a table -->
+                {% for i in range(9) %}
+                <tr>
+                    {% for j in range(9) %}
+                    <td> 
+                        <input type="text" maxlength="1">
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+            <div class="button-container">
+                <button class="action-button" id="clearButton">Clear</button>
+                <button class="action-button" id="solveButton">Solve</button>
+                <button class="action-button" id="hintButton">Hint</button>
+            </div>
+            <div class="button-container">
+                <button class="action-button" id="todaysEasyButton">Fill Today's Easy</button>
+                <button class="action-button" id="todaysMediumButton">Fill Today's Medium</button>
+                <button class="action-button" id="todaysHardButton">Fill Today's Hard</button>
+            </div>
+        </div>
+
+        <!-- Popup Windows -->
+        <div id="help-popup" class="popup hidden">
+            <div class="popup-content">
+                <span class="close-popup">&times;</span>
+                <h2>How To Use</h2>
+                <p>
+                    <ol>
+                        <li>
+                            Fill in the Sudoku grid with the starting numbers by doing one of the following:
+                            <ul>
+                                <li>Press the "Fill Today's Easy/Medium/Hard" button to get today's sudoku puzzle of the selected difficulty.</li>
+                                <li>Press the squares and type the numbers using your keyboard.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            Solve the puzzle by doing one of the following:
+                            <ul>
+                                <li>Press the "Solve" button to solve the puzzle.</li>
+                                <li>Press a square and then press the "Hint" button to get the correct number for the selected cell.</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </p>
+            </div>
+        </div>
+    </main>
+    <footer class="footer"></footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const link = document.querySelector('.help-button');
+            const popup = document.querySelector('.popup');
+            const closePopup = popup.querySelector('.close-popup');
+    
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                popup.classList.remove('hidden');
+            });
+    
+            closePopup.addEventListener('click', () => {
+                popup.classList.add('hidden');
+            });
+
+            // Close the popup when clicking outside of the content
+            window.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.classList.add('hidden');
+                }
+            });
+        });
+
+        const cells = document.querySelectorAll('td input');
+        let selectedCell = cells[0];
+        let selectedCellIndex = 0;
+
+        function resetCellColors() {
+            cells.forEach(cell => {
+                cell.style.color = 'black';
+            });
+        }
+
+        function isValidSudoku(board) {
+            const seen = new Set();
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    const cell = board[i][j];
+                    if (cell === 0) continue;
+                    const rowKey = `row ${i} has ${cell}`;
+                    const colKey = `col ${j} has ${cell}`;
+                    const boxKey = `box ${Math.floor(i / 3)}-${Math.floor(j / 3)} has ${cell}`;
+                    if (seen.has(rowKey) || seen.has(colKey) || seen.has(boxKey)) {
+                        return false;
+                    }
+                    seen.add(rowKey);
+                    seen.add(colKey);
+                    seen.add(boxKey);
+                }
+            }
+            return true;
+        }
+
+        function getBoardFromCells() {
+            const board = [];
+            for (let i = 0; i < 9; i++) {
+                const row = [];
+                for (let j = 0; j < 9; j++) {
+                    const cell = cells[i * 9 + j];
+                    row.push(cell.value ? parseInt(cell.value, 10) : 0);
+                }
+                board.push(row);
+            }
+            return board;
+        }
+
+        // Ensure only numbers 1-9 are allowed and move to next cell on input
+        document.querySelectorAll('td input').forEach((cell, index, cells) => {
+            cell.addEventListener('input', function() {
+                resetCellColors();
+                if (!/^[1-9]$/.test(this.value)) {
+                    this.value = '';
+                } else {
+                    // Move to the next empty cell if a valid number is entered
+                    for (let i = index + 1; i < cells.length; i++) {
+                        if (cells[i].value === '') {
+                            cells[i].focus();
+                            break;
+                        }
+                    }
+                }
+            });
+
+            cell.addEventListener('keydown', function(e) {
+                resetCellColors();
+                if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                    // Prevent the default backspace behavior
+                    e.preventDefault();
+                    // Move to the previous cell
+                    const prevCell = cells[index - 1];
+                    if (prevCell) {
+                        prevCell.focus();
+                        prevCell.value = '';  // Clear the previous cell's value
+                    }
+                }
+            });
+
+            cell.addEventListener('focus', function() {
+                selectedCell = this;
+                selectedCellIndex = index;
+            });
+        });
+
+        // Clear all inputs and reset focus to the first input
+        document.getElementById('clearButton').addEventListener('click', function() {
+            resetCellColors();
+            cells.forEach(cell => {
+                cell.value = '';
+            });
+            cells[0].focus();
+        });
+
+        function fetchPuzzleAndFill(difficulty) {
+            resetCellColors();
+            fetch(`/api/sudoku/${difficulty}`)
+                .then(response => response.json())
+                .then(data => {
+                    const puzzle = data['result']
+                    if (puzzle && puzzle.length === 81) {
+                        cells.forEach((cell, index) => {
+                            cell.value = puzzle[index] !== 0 ? puzzle[index] : '';
+                        });
+                    } else {
+                        console.error('Invalid puzzle data received from API');
+                    }
+                })
+                .catch(error => console.error('Error fetching puzzle:', error));
+        }
+
+        // Fetch easy puzzle from API and fill the grid
+        document.getElementById('todaysEasyButton').addEventListener('click', function() {
+            fetchPuzzleAndFill('easy');
+        });
+
+        // Fetch medium puzzle from API and fill the grid
+        document.getElementById('todaysMediumButton').addEventListener('click', function() {
+            fetchPuzzleAndFill('medium');
+        });
+
+        // Fetch hard puzzle from API and fill the grid
+        document.getElementById('todaysHardButton').addEventListener('click', function() {
+            fetchPuzzleAndFill('hard');
+        });
+
+        document.getElementById('solveButton').addEventListener('click', function() {
+            const board = getBoardFromCells();
+
+            if (!isValidSudoku(board)) {
+                console.error('Invalid Sudoku board');
+                return;
+            }
+
+            fetch('/api/sudoku', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ board })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    solution = data['result'];
+                    if (solution && solution.length === 9) {
+                        for (let i = 0; i < 9; i++) {
+                            for (let j = 0; j < 9; j++) {
+                                const cell = cells[i * 9 + j];
+                                if (board[i][j] === 0) { // Only change empty cells
+                                    cell.value = solution[i][j];
+                                    cell.style.color = 'green';
+                                }
+                            }
+                        }
+                    } else {
+                        console.error('Invalid solved board data received from API');
+                    }
+                })
+                .catch(error => console.error('Error solving puzzle:', error));
+        });
+
+        document.getElementById('hintButton').addEventListener('click', function() {
+            const board = getBoardFromCells();
+
+            if (!isValidSudoku(board)) {
+                console.error('Invalid Sudoku board');
+                return;
+            }
+
+            fetch('/api/sudoku', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ board })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    solution = data['result'];
+                    if (solution && solution.length === 9) {
+                        selectedCell.value = solution[Math.floor(selectedCellIndex / 9)][selectedCellIndex % 9];
+                        selectedCell.style.color = 'blue'; // Indicate this is a hint
+                    } else {
+                        console.error('Invalid solved board data received from API');
+                    }
+                })
+                .catch(error => console.error('Error solving puzzle:', error));
+        });
+    </script>
+</body>
+</html>

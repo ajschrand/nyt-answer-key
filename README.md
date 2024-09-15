@@ -2,8 +2,9 @@
 
 This app implements automated solvers for a variety of games in the New York Times collection. These games currently include Spelling Bee, Wordle, Connections, Crossword, Sudoku, and Letter Boxed.
 
-The app is currently interactable via Command Line Interface (CLI). To start the app, download the code and run `python main.py` in the parent directory.
-
+The app is currently interactable via website or Command Line Interface (CLI): 
+- To use the website, visit https://nyt-solver.onrender.com, press a game button, and press the help button in the upper right corner to learn how to use the interface. Be aware that because the app is currently hosted on a free instance of Render, the website may take up to a minute to load.
+- To start the CLI, download the code and run `python cli.py` in the parent directory.
 The CLI will prompt you with a series of menu options that let you choose which game to play and how you want to play it. Enter a number on the menu to select its corresponding option until you have selected a game to play. Then, follow the instructions printed for that game.
 
 
@@ -13,7 +14,7 @@ The CLI will prompt you with a series of menu options that let you choose which 
 
 Spelling Bee is a game where players create words using letters from the hive, which is a list of 7 letters with one designated as the center letter. The words must include the center letter and contain at least 4 letters. 4-letter words are worth 1 point each, and longer words earn 1 point per letter. Additionally, each puzzle includes at least one “pangram” which uses every letter. Pangrams are worth 1 point per letter plus 7 extra points.
 
-The Spelling Bee solver starts with a list of all English words and filters words that are invalid for the given hive. It sorts the remaining words by point value descending.
+The Spelling Bee solver starts with a list of all English words and filters words that are invalid for the given hive. It sorts the remaining words by point value descending and displays them to the user.
 
 ## Wordle
 
@@ -22,9 +23,7 @@ Wordle is a game where players try to guess a 5-letter word -- the Wordle -- in 
  - Yellow letters are in the Wordle but are not in the correct position in the guess
  - Black letters are not in the Wordle
 
-The Wordle solver starts with a list of all valid Wordle answers and makes or suggests guesses from it until the puzzle is solved, pruning the list of now-invalid words after each guess. The way it determines its next guess depends on the amount of information (total number of yellow and green letters) it currently has:
- - If the solver knows 2 or fewer letters, it makes the guess that maximizes the fequencies of appearances of letters in their respective positions in the list of Wordle answers. For example, 's' is the most common first letter in the list of Wordle answers, so the solver would prefer answers that start with 's', given that they are valid with respect to any previously made guesses.
- - If the solver knows 3 or more letters, it makes the guess that is the most frequently used word from among the remaining choices. It does this by referencing the `wordfreq` library.
+The Wordle solver starts with a list of all valid Wordle answers and makes or suggests guesses from it until the puzzle is solved, pruning the list of now-invalid words after each guess. It suggests guesses that maximize the fequencies of appearances of letters in their respective positions in the pruned list of Wordle answers. For example, 's' is the most common first letter in the list of Wordle answers, so the solver would initally prefer answers that start with 's'.
 
 ## Connections
 
@@ -38,7 +37,7 @@ The Connections solver plays in the following manner:
  5. Recieve feedback on the quality of the guess and eliminate now-invalid groupings accordingly.
  6. If the puzzle is not solved, return to step 4.
 
- Be aware that the Connections solver performs very poorly in human terms. Grouping words together is a very abstract task, and this particular algorithm cannot accomplish it in the allotted amount of guesses for a typical Connections game.
+ Be aware that the Connections solver performs very poorly in human terms. Grouping words together is a very abstract task, and this particular algorithm cannot accomplish it in the allotted amount of guesses for a typical Connections game. Also note that this algorithm requires too much memory to run on a free instance of Render, so the website simply filters invalid guesses instead.
 
 ## Sudoku
 

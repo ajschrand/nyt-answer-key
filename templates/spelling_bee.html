@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Bee</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">&lt;</button>
+    <button data-popup="help-popup" class="help-button">?</button>
+    <header>
+        <h1>Spelling Bee</h1>
+    </header>
+    <main>
+        <div class="game-list">
+            <div class="game-content">
+                <div class="hexagon-grid">
+                    <div class="hexagon middle"></div>
+                    <div class="hexagon left"></div>
+                    <div class="hexagon right"></div>
+                    <div class="hexagon top-left"></div>
+                    <div class="hexagon top-right"></div>
+                    <div class="hexagon bottom-left"></div>
+                    <div class="hexagon bottom-right"></div>
+                </div>
+                <h2>Answers</h2>
+                <div class="word-list-container">
+                    <ul class="word-list" id="wordList">
+                        <!-- Words will be added here -->
+                    </ul>
+                </div>
+                <div class="button-container">
+                    <button class="action-button" id="clearButton">Clear</button>
+                    <button class="action-button" id="todaysPuzzleButton">Fill Today's Puzzle</button>
+                    <button class="action-button" id="solveButton" disabled>Solve</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popup Windows -->
+        <div id="help-popup" class="popup hidden">
+            <div class="popup-content">
+                <h2>How To Use</h2>
+                <span class="close-popup">&times;</span>
+                <p>
+                    <ol>
+                        <li>
+                            Input the letters from the hexagons into the text boxes by doing one of the following:
+                            <ul>
+                                <li>Press the "Fill Today's Puzzle" button to get the letters for today's Spelling Bee puzzle.</li>
+                                <li>Type the letters using your computer's keyboard or the on-screen keyboard.</li>
+                            </ul>
+                        </li>
+                        <li>Press the "Solve" button to display all the answers sorted by score.</li>
+                    </ol>
+                </p>
+            </div>
+        </div>
+    </main>
+    <footer class="footer-clear">
+        <div class="game-content">
+            <div id="keyboard-container" class="keyboard-container">
+                <div class="keyboard-row">
+                    <button class="key">Q</button>
+                    <button class="key">W</button>
+                    <button class="key">E</button>
+                    <button class="key">R</button>
+                    <button class="key">T</button>
+                    <button class="key">Y</button>
+                    <button class="key">U</button>
+                    <button class="key">I</button>
+                    <button class="key">O</button>
+                    <button class="key">P</button>
+                </div>
+                <div class="keyboard-row">
+                    <button class="key">A</button>
+                    <button class="key">S</button>
+                    <button class="key">D</button>
+                    <button class="key">F</button>
+                    <button class="key">G</button>
+                    <button class="key">H</button>
+                    <button class="key">J</button>
+                    <button class="key">K</button>
+                    <button class="key">L</button>
+                </div>
+                <div class="keyboard-row">
+                    <button class="key">Z</button>
+                    <button class="key">X</button>
+                    <button class="key">C</button>
+                    <button class="key">V</button>
+                    <button class="key">B</button>
+                    <button class="key">N</button>
+                    <button class="key">M</button>
+                </div>
+                <div class="keyboard-row">
+                    <button class="key" id="enter-key">Enter</button>
+                    <button class="key" id="backspace-key">Backspace</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <footer class="footer"></footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const link = document.querySelector('.help-button');
+            const popup = document.querySelector('.popup');
+            const closePopup = popup.querySelector('.close-popup');
+    
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                popup.classList.remove('hidden');
+            });
+    
+            closePopup.addEventListener('click', () => {
+                popup.classList.add('hidden');
+            });
+
+            // Close the popup when clicking outside of the content
+            window.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.classList.add('hidden');
+                }
+            });
+        });
+
+        const hexagons = document.querySelectorAll('.hexagon');
+        const solveButton = document.getElementById('solveButton');
+        let currentHexagonIndex = 0;
+
+        document.addEventListener('keydown', handleKeyPress);
+
+        document.querySelectorAll('.key').forEach(key => {
+            key.addEventListener('click', () => {
+                const keyContent = key.textContent;
+                handleKeyPress({ key: keyContent });
+            });
+        });
+
+        function handleKeyPress(event) {
+            const key = event.key;
+    
+            if (/^[a-zA-Z]$/.test(key)) {
+                // Check if the key is a single letter
+                if (currentHexagonIndex < 7) {
+                    hexagons[currentHexagonIndex].textContent = event.key.toUpperCase();
+                    currentHexagonIndex++;
+                    if (currentHexagonIndex === 7) {
+                        solveButton.disabled = false;
+                    }
+                }
+            } else if (key === 'Backspace') {
+                // Handle backspace
+                if (currentHexagonIndex > 0) {
+                    currentHexagonIndex--;
+                    hexagons[currentHexagonIndex].textContent = '';
+                    solveButton.disabled = true;
+                }
+            } else if (key === 'Enter') {
+                // Handle enter
+                solve();
+            }
+        }
+
+        document.getElementById('clearButton').addEventListener('click', function() {
+            hexagons.forEach(hex => hex.textContent = '');
+            document.getElementById('wordList').innerHTML = '';
+
+            currentHexagonIndex = 0;
+            solveButton.disabled = true;
+        });
+
+        document.getElementById('todaysPuzzleButton').addEventListener('click', function() {
+            fetch('/api/spelling_bee/todays_puzzle')
+            .then(response => response.json())
+            .then(data => {
+                const letters = data["result"];
+                hexagons.forEach((hex, index) => {
+                    hex.textContent = letters[index].toUpperCase();
+                });
+                document.getElementById('wordList').innerHTML = '';
+            })
+            .catch(error => console.error('Error fetching new letters:', error));
+
+            currentHexagonIndex = 7;
+            solveButton.disabled = false;
+        });
+
+        document.getElementById('solveButton').addEventListener('click', solve);
+
+        function solve() {
+            if (currentHexagonIndex < 7) {
+                return;
+            }
+
+            const centerLetter = hexagons[0].textContent.toLowerCase();
+            const lettersList = Array.from(hexagons).map(hexagon => hexagon.textContent.toLowerCase());
+
+            console.log(centerLetter, lettersList);
+
+            sendSpellingBeeData(centerLetter, lettersList);
+        }
+
+        async function sendSpellingBeeData(centerLetter, lettersList) {
+            // Send the data to the backend
+            const response = await fetch('/api/spelling_bee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ centerLetter, lettersList }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const wordList = document.getElementById('wordList');
+                wordList.innerHTML = ''; // Clear previous words
+                const words = data["result"]
+                words.forEach(word => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = word;
+                    wordList.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error fetching words:', error));
+        }
+    </script>
+</body>
+</html>

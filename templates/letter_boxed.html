@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter Boxed</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">&lt;</button>
+    <button data-popup="help-popup" class="help-button">?</button>
+    <header>
+        <h1>Letter Boxed</h1>
+    </header>
+    <main>
+        <div class="game-content">
+            <canvas id="letterBoxCanvas" width="400" height="400"></canvas>
+            <h2>Input Sides</h2>
+            <div class="input-row">
+                <input type="text" class="letter-input" id="top" placeholder="ABC" maxlength="3">
+                <input type="text" class="letter-input" id="left" placeholder="DEF" maxlength="3">
+                <input type="text" class="letter-input" id="right" placeholder="GHI" maxlength="3">
+                <input type="text" class="letter-input" id="bottom" placeholder="JKL" maxlength="3">
+            </div>
+            <h2>Answers</h2>
+            <div class="word-list-container">
+                <ul class="word-list" id="wordList"></ul>
+            </div>
+            <div class="button-container">
+                <button class="action-button" id="clearButton">Clear</button>
+                <button class="action-button" id="todaysPuzzleButton">Fill Today's Puzzle</button>
+                <button class="action-button" id="solveButton" disabled>Solve</button>
+            </div>
+        </div>
+
+        <!-- Popup Windows -->
+        <div id="help-popup" class="popup hidden">
+            <div class="popup-content">
+                <span class="close-popup">&times;</span>
+                <h2>How To Use</h2>
+                <p>
+                    <ol>
+                        <li>
+                            Input the letters from the sides into the text boxes by doing one of the following:
+                            <ul>
+                                <li>Press the "Fill Today's Puzzle" button to get the letters for today's Letter Boxed puzzle.</li>
+                                <li>Press the input boxes under "Input Sides" and type the letters using your keyboard.</li>
+                            </ul>
+                        </li>
+                        <li>Press the "Solve" button to display all the answers sorted by length.</li>
+                    </ol>
+                </p>
+            </div>
+        </div>
+    </main>
+    <footer class="footer"></footer>
+    <script>
+        class Position {
+            constructor(x, y, offset) {
+                this.x = x;
+                this.y = y;
+                this.offset = offset;
+            }
+        }
+
+        const inputs = document.querySelectorAll('.letter-input');
+        const canvas = document.getElementById('letterBoxCanvas');
+        const clearButton = document.getElementById('clearButton');
+        const todaysPuzzleButton = document.getElementById('todaysPuzzleButton');
+        const solveButton = document.getElementById('solveButton');
+        const wordList = document.getElementById('wordList');
+
+        let topLeft, topMiddle, topRight, 
+            leftTop, leftMiddle, leftBottom, 
+            rightTop, rightMiddle, rightBottom, 
+            bottomLeft, bottomMiddle, bottomRight;
+
+        let positions = [];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const link = document.querySelector('.help-button');
+            const popup = document.querySelector('.popup');
+            const closePopup = popup.querySelector('.close-popup');
+    
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                popup.classList.remove('hidden');
+            });
+    
+            closePopup.addEventListener('click', () => {
+                popup.classList.add('hidden');
+            });
+
+            // Close the popup when clicking outside of the content
+            window.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.classList.add('hidden');
+                }
+            });
+
+            const ctx = canvas.getContext('2d');
+            const canvasWidth = canvas.width;
+            const canvasHeight = canvas.height;
+            const squareSize = canvasWidth / 4; // Adjust as needed
+        
+            // Draw the outer square
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(squareSize, squareSize, squareSize * 2, squareSize * 2);
+
+            topLeft = new Position(canvasWidth / 3, squareSize, 'top');
+            topMiddle = new Position(canvasWidth / 2, squareSize, 'top');
+            topRight = new Position((canvasWidth * 2) / 3, squareSize, 'top');
+
+            leftTop = new Position(squareSize, canvasHeight / 3, 'left');
+            leftMiddle = new Position(squareSize, canvasHeight / 2, 'left');
+            leftBottom = new Position(squareSize, (canvasHeight * 2) / 3, 'left');
+            
+            rightTop = new Position(canvasWidth - squareSize, canvasHeight / 3, 'right');
+            rightMiddle = new Position(canvasWidth - squareSize, canvasHeight / 2, 'right');
+            rightBottom = new Position(canvasWidth - squareSize, (canvasHeight * 2) / 3, 'right');
+
+            bottomLeft = new Position(canvasWidth / 3, canvasHeight - squareSize, 'bottom');
+            bottomMiddle = new Position(canvasWidth / 2, canvasHeight - squareSize, 'bottom');
+            bottomRight = new Position((canvasWidth * 2) / 3, canvasHeight - squareSize, 'bottom');
+
+            positions = [topLeft, topMiddle, topRight, leftTop, leftMiddle, leftBottom, rightTop, rightMiddle, rightBottom, bottomLeft, bottomMiddle, bottomRight];
+
+            // Draw circles on each side
+            drawAllCircles(ctx, positions);
+
+            // Draw letters for each circle
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+            drawAllLetters(ctx, positions, letters)
+        });
+        
+        function drawCircle(ctx, x, y) {
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, 2 * Math.PI);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        function drawAllCircles(ctx, positions) {
+            positions.forEach(position => {
+                drawCircle(ctx, position.x, position.y);
+            });
+        }
+        
+        function drawLetter(ctx, x, y, offset, letter) {
+            ctx.fillStyle = '#000';
+            ctx.font = '18px Arial';
+            
+            if (offset === 'top') {
+                ctx.fillText(letter, x - 6, y - 15);
+            } else if (offset === 'left') {
+                ctx.fillText(letter, x - 30, y + 6);
+            } else if (offset === 'right') {
+                ctx.fillText(letter, x + 17, y + 6);
+            } else if (offset === 'bottom') {
+                ctx.fillText(letter, x - 5, y + 30);
+            }
+        }
+
+        function drawAllLetters(ctx, positions, letters) {
+            for (let i = 0; i < positions.length; i++) {
+                drawLetter(ctx, positions[i].x, positions[i].y, positions[i].offset, letters[i]);
+            }
+        }
+
+        function setCanvasToInputLetters() {
+            // clear the canvas, redraw the squares and circles, and redraw the letters from the inputs
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+
+            ctx.strokeRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2);
+            drawAllCircles(ctx, positions);
+
+            const letters = [];
+            inputs.forEach(input => {
+                for (let i = 0; i < input.value.length; i++) {
+                    letters.push(input.value[i].toUpperCase());
+                }
+
+                for (let i = input.value.length; i < 3; i++) {
+                    letters.push('');
+                }
+            });
+
+            drawAllLetters(ctx, positions, letters);
+        }
+
+        clearButton.addEventListener('click', () => {
+            inputs.forEach(input => {
+                input.value = '';
+            });
+
+            setCanvasToInputLetters();
+
+            solveButton.disabled = true;
+
+            wordList.innerHTML = '';
+        });
+
+        function isAllFilled() {
+            for (let i = 0; i < inputs.length; i++) {
+                if (inputs[i].value.length !== 3) {
+                    return false;
+                }
+            }
+        
+            return true;
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                setCanvasToInputLetters();
+
+                if (isAllFilled()) {
+                    solveButton.disabled = false;
+                } else {
+                    solveButton.disabled = true;
+                }
+            });
+        });
+
+        todaysPuzzleButton.addEventListener('click', function() {
+            fetch('/api/letter_boxed/todays_puzzle')
+            .then(response => response.json())
+            .then(data => {
+                const sides = data["result"];
+                if (sides.length !== 4) {
+                    console.error('Error fetching today\'s puzzle:', sides);
+                    return;
+                }
+
+                for (let i = 0; i < sides.length; i++) {
+                    inputs[i].value = sides[i];
+                }
+
+                setCanvasToInputLetters();
+
+                solveButton.disabled = false;
+            })
+            .catch(error => console.error('Error fetching new letters:', error));
+
+            currentHexagonIndex = 7;
+            solveButton.disabled = false;
+        });
+
+        solveButton.addEventListener('click', function() {
+            const board = [];
+            inputs.forEach(input => {
+                board.push(input.value);
+            });
+
+            fetch('/api/letter_boxed', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ board })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const words = data["result"];
+                if (words.length === 0) {
+                    console.error('Error fetching words:', words);
+                    return;
+                }
+
+                while (wordList.firstChild) {
+                    wordList.removeChild(wordList.firstChild);
+                }
+
+                words.forEach(word => {
+                    const li = document.createElement('li');
+                    li.textContent = word.toString().replace(",", ", ");
+                    wordList.appendChild(li);
+                });
+            })
+            .catch(error => console.error('Error fetching words:', error));
+        });
+    </script>
+</body>
+</html>
