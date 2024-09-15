@@ -278,7 +278,7 @@
 
                 words.forEach(word => {
                     const li = document.createElement('li');
-                    li.textContent = word;
+                    li.textContent = word.toString().replace(",", ", ");
                     wordList.appendChild(li);
                 });
             })

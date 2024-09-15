@@ -101,15 +101,6 @@ def api_connections():
     result = remaining_groupings
     return jsonify(result=result)
 
-# API endpoint for getting today's connections puzzle
-@app.route('/api/connections/todays_puzzle', methods=['GET'])
-def api_c_todays_puzzle():
-    solutions = connections_data()
-    board = [word for group in solutions for word in group]
-    shuffle(board)
-    result = board
-    return jsonify(result=result)
-
 # API endpoint for solving a letter boxed puzzle
 @app.route('/api/letter_boxed', methods=['POST'])
 def api_letter_boxed():
