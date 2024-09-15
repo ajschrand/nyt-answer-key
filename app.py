@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, jsonify
-from random import shuffle
 
 from spelling_bee.spelling_bee import auto_spelling_bee
 from wordle.wordle import generate_guesses
@@ -9,7 +8,6 @@ from letter_boxed.letter_boxed import auto_letter_boxed
 
 from utils.scraping_utils import spelling_bee_data
 from utils.scraping_utils import sudoku_data
-from utils.scraping_utils import connections_data
 from utils.scraping_utils import letter_boxed_data
 
 app = Flask(__name__)
