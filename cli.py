@@ -119,6 +119,8 @@ def letter_boxed():
 
 
 if __name__ == "__main__":
+    print("Welcome to NYT Answer Key!")
+    
     menu = Menu("Which game would you like to play?")
     menu.add_option("Spelling Bee", spelling_bee)
     menu.add_option("Wordle", wordle)
