@@ -1,10 +1,7 @@
 # NYT Answer Key
 
-This app implements automated solvers for a variety of games in the New York Times collection. These games currently include Spelling Bee, Wordle, Connections, Crossword, Sudoku, and Letter Boxed.
-
-The app is currently interactable via website or Command Line Interface (CLI): 
-- To use the website, visit https://nyt-answer-key.onrender.com, press a game button, and press the help button in the upper right corner to learn how to use the interface. Be aware that because the app is currently hosted on a free instance of Render, the website may take up to a minute to load.
-- To start the CLI, download the code and run `python cli.py` in the parent directory. The CLI will prompt you with a series of menu options that let you choose which game to play and how you want to play it. Enter a number on the menu to select its corresponding option until you have selected a game to play. Then, follow the instructions printed for that game.
+This app implements automated solvers or helpers for a variety of games in the New York Times collection: Spelling Bee, Wordle, Connections, Crossword, Sudoku, and Letter Boxed.
+To use it, visit https://nyt-answer-key.onrender.com, press a game button, and press the help button in the upper right corner to learn how to use the interface. Be aware that because the app is currently hosted on a free instance of Render, the website may take up to a minute to load.
 
 
 # Games
