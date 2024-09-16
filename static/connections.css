@@ -1,0 +1,58 @@
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 60px);
+    gap: 10px;
+}
+
+.grid-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 60px;
+    background-color: #e0e0e0; /* Light gray color */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.grid-item input {
+    width: 90%;
+    height: 80%;
+    text-align: center;
+    font-size: 1.2em; /* Bigger text */
+    border: none;
+    outline: none;
+    background-color: transparent;
+    color: #333;
+    pointer-events: none;  /* Disable pointer events by default */
+}
+
+.grid-item input.edit-mode {
+    pointer-events: auto;  /* Enable pointer events in edit mode */
+}
+
+.grid-item.selectable {
+    cursor: pointer;
+}
+
+.grid-item.selected {
+    background-color: #a0a0a0; /* Darker gray for selected items */
+}
+
+.grid-item.correct {
+    background-color: rgb(71, 218, 71);
+}
+
+.radio-button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px; /* Adjust the gap as needed */
+}
+
+.radio-button {
+    margin: 0 5px;
+    accent-color: #ff6f61; /* Customize the color to match your theme */
+}
+

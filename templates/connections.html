@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connections</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='connections.css') }}">
 </head>
 <body>
     <button onclick="window.location.href='{{ url_for('index') }}'" class="back-button">&lt;</button>
@@ -32,16 +33,18 @@
                 <button class="action-button" id="deselectButton" disabled>Deselect All</button>
                 <button class="action-button" id="editButton" disabled>Start Game</button>
             </div>
-            <div class="radio-button-container">
-                <label>
-                    <input type="radio" name="option" value="0" class="radio-button" disabled checked>Wrong
-                </label>
-                <label>
-                    <input type="radio" name="option" value="3" class="radio-button" disabled>One Away
-                </label>
-                <label>
-                    <input type="radio" name="option" value="4" class="radio-button" disabled>Correct
-                </label>
+            <div class="button-container">
+                <div class="radio-button-container">
+                    <label>
+                        <input type="radio" name="option" value="0" class="radio-button" disabled checked>Wrong
+                    </label>
+                    <label>
+                        <input type="radio" name="option" value="3" class="radio-button" disabled>One Away
+                    </label>
+                    <label>
+                        <input type="radio" name="option" value="4" class="radio-button" disabled>Correct
+                    </label>
+                </div>
                 <button class="action-button" id="submitButton" disabled >Submit Guess</button>
             </div>
         </div>
