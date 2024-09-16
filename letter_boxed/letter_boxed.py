@@ -51,15 +51,12 @@ def find_valid_words(board):
             letter_locations[letter] = i
     
     def is_word_valid(word):
-        if word[0] not in letter_locations:
-            return False
-        
-        prev_location = letter_locations[word[0]]
-        for i in range(1, len(word)):
-            if word[i] not in letter_locations:
+        prev_location = -1
+        for c in word:
+            if c not in letter_locations:
                 return False
             
-            cur_location = letter_locations[word[i]]
+            cur_location = letter_locations[c]
             if prev_location == cur_location:
                 return False
             
@@ -68,6 +65,7 @@ def find_valid_words(board):
         return True
     
     valid_words = [word for word in get_english_words() if is_word_valid(word)]
+    
     return valid_words
 
 
@@ -97,17 +95,27 @@ def find_two_word_solutions(board, words):
     Returns:
         List: A list of two-word solutions that can be made from the board
     """
-    letters = {letter for side in board for letter in side}
+    def bitset(word):
+        res = 0
+        for c in word:
+            res |= 1 << (ord(c) - ord("a"))
+            
+        return res
+    
+    letters = 0
+    for side in board:
+        letters |= bitset(side)
     
     first_letter_to_sets_to_words = defaultdict(lambda: defaultdict(list))
     for word in words:
-        first_letter_to_sets_to_words[word[0]][frozenset(word)].append(word)
+        first_letter_to_sets_to_words[word[0]][bitset(word)].append(word)
         
     solutions = []
     for first_word in words:
         last_letter = first_word[-1]
+        first_word_set = bitset(first_word)
         for second_word_set in first_letter_to_sets_to_words[last_letter]:
-            if set(first_word).union(second_word_set) != letters:
+            if (first_word_set | second_word_set) & letters != letters:
                 continue
             
             for second_word in first_letter_to_sets_to_words[last_letter][second_word_set]:
