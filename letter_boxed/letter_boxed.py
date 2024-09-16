@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from utils.str_utils import bitset
 from utils.str_utils import get_list_grid
 from utils.str_utils import word_has_all
 from utils.str_utils import get_english_words
@@ -65,7 +66,6 @@ def find_valid_words(board):
         return True
     
     valid_words = [word for word in get_english_words() if is_word_valid(word)]
-    
     return valid_words
 
 
@@ -81,7 +81,8 @@ def find_one_word_solutions(board, words):
         List: A list of one-word solutions that can be made from the board
     """
     letters = [letter for side in board for letter in side]
-    return [word for word in words if word_has_all(word, letters)]
+    solutions = [word for word in words if word_has_all(word, letters)]
+    return solutions
 
 
 def find_two_word_solutions(board, words):
@@ -95,16 +96,9 @@ def find_two_word_solutions(board, words):
     Returns:
         List: A list of two-word solutions that can be made from the board
     """
-    def bitset(word):
-        res = 0
-        for c in word:
-            res |= 1 << (ord(c) - ord("a"))
-            
-        return res
-    
-    letters = 0
+    letters = bitset()
     for side in board:
-        letters |= bitset(side)
+        letters += bitset(side)
     
     first_letter_to_sets_to_words = defaultdict(lambda: defaultdict(list))
     for word in words:
@@ -115,7 +109,7 @@ def find_two_word_solutions(board, words):
         last_letter = first_word[-1]
         first_word_set = bitset(first_word)
         for second_word_set in first_letter_to_sets_to_words[last_letter]:
-            if (first_word_set | second_word_set) & letters != letters:
+            if first_word_set.union(second_word_set) != letters:
                 continue
             
             for second_word in first_letter_to_sets_to_words[last_letter][second_word_set]:

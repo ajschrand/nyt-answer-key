@@ -66,18 +66,21 @@ def auto_spelling_bee(center_letter, letters_list):
         if len(word) == 4:
             return 1
         
-        bonus = 7 if word_has_all(word, letters_list) else 0
-        return len(word) + bonus
+        score = len(word)
+        if word_has_all(word, letters_list):
+            score += 7
+            
+        return score
         
     answers = []
     for word in get_english_words():
+        if not word_has_only(word, letters_list):
+            continue
+
         if len(word) < 4:
             continue
 
         if center_letter not in word:
-            continue
-
-        if not word_has_only(word, letters_list):
             continue
 
         answers.append(word)

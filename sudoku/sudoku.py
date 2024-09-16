@@ -15,6 +15,23 @@ class SudokuBoard:
         solve(board, i=0, j=0): Recursive helper function for solveSudoku().
         __str__(): Returns a string representation of the solved board with color-coded values.
     """
+    @staticmethod
+    def is_valid_num(board, i, j, num):
+        for x in range(9):
+            if board[i][x] == num:
+                return False
+
+            if board[x][j] == num:
+                return False
+
+        # Gets the top left coordinates of the section containing the i,j cell
+        square_top_x, square_top_y = 3 * (i//3), 3 * (j//3)
+        for x in range(square_top_x, square_top_x + 3):
+            for y in range(square_top_y, square_top_y + 3):
+                if board[x][y] == num:
+                    return False
+
+        return True
 
     def __init__(self, board):
         """
@@ -24,64 +41,39 @@ class SudokuBoard:
             board (list[list[int]]): A 9x9 2D list representing the initial Sudoku board.
         """
         self.initial_board = board
+        self.empty_indexes = []
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if board[i][j] == 0:
+                    self.empty_indexes.append((i, j))
+                    
         # Deep copy to avoid modifying original board
         self.solved_board = deepcopy(board)
 
-    def solve_sudoku(self):
+    def solve(self, next_empty_index=0):
         """
-        Solves the Sudoku board in place using backtracking.
-        """
-        return self.solve(self.solved_board)
-
-    def solve(self, board, i=0, j=0):
-        """
-        Recursive helper function to solve the Sudoku board using backtracking.
+        Recursive function to solve the Sudoku board using backtracking.
 
         Args:
-            board (list[list[int]]): The current state of the board.
-            i (int, optional): The current row index (default: 0).
-            j (int, optional): The current column index (default: 0).
+            next_empty_index (int, optional): The index of self.empty_indexes to get the next coordinate pair from
 
         Returns:
             bool: True if a solution is found, False otherwise.
         """
-        def find_next_blank_Cell(board):
-            for x in range(0, 9):
-                for y in range(0, 9):
-                    if board[x][y] == 0:
-                        return x, y
-
-            return -1, -1
-
-        def is_valid_num(board, i, j, e):
-            for x in range(9):
-                if board[i][x] == e:
-                    return False
-
-            for x in range(9):
-                if board[x][j] == e:
-                    return False
-
-            # Gets the top left coordinates of the section containing the i,j cell
-            squareTopX, squareTopY = 3 * (i//3), 3 * (j//3)
-            for x in range(squareTopX, squareTopX + 3):
-                for y in range(squareTopY, squareTopY + 3):
-                    if board[x][y] == e:
-                        return False
-
+        
+        if next_empty_index == len(self.empty_indexes):
             return True
-
-        i, j = find_next_blank_Cell(board)
-        if i == -1:
-            return True
-
-        for e in range(1, 10):
-            if is_valid_num(board, i, j, e):
-                board[i][j] = e
-                if self.solve(board, i, j):
-                    return True  # Solution found
-                board[i][j] = 0  # Backtrack
-
+        
+        i, j = self.empty_indexes[next_empty_index]
+        for num in range(1, 10):
+            if not SudokuBoard.is_valid_num(self.solved_board, i, j, num):
+                continue
+            
+            self.solved_board[i][j] = num
+            if self.solve(next_empty_index + 1):
+                return True
+            
+        self.solved_board[i][j] = 0
         return False
 
     def __str__(self) -> str:
@@ -99,7 +91,9 @@ class SudokuBoard:
                     line += f"{Fore.GREEN}{num}{Fore.RESET} "
                 else:
                     line += f"{num} "
+                    
             board_str += line + "\n"
+            
         return board_str.strip()
 
 
@@ -112,7 +106,7 @@ def solve_sudoku(board):
         board (List): A 9x9 2D list representing the initial Sudoku board.
     """
     s = SudokuBoard(board)
-    if s.solve_sudoku():
+    if s.solve():
         print(s)
     else:
         print("No solution found.")
@@ -129,7 +123,7 @@ def auto_sudoku(board):
         List: A 9x9 2D list representing the solved Sudoku board.
     """
     s = SudokuBoard(board)
-    if s.solve_sudoku():
+    if s.solve():
         return s.solved_board
 
     return None
