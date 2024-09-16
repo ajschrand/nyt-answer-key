@@ -71,13 +71,7 @@ def get_list_grid(list, size):
 
 
 def word_has_all(word, letters):
-    s = set(letters)
-    for letter in word:
-        s.discard(letter)
-        if len(s) == 0:
-            return True
-
-    return False
+    return len(set(letters) - set(word)) == 0
 
 
 def word_has_only(word, letters):
@@ -93,6 +87,7 @@ def word_has_duplicates(word):
     for letter in word:
         if letter in seen:
             return True
+        
         seen.add(letter)
 
     return False
