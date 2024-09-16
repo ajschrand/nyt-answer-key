@@ -43,14 +43,6 @@
     background-color: rgb(71, 218, 71);
 }
 
-.radio-button-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 10px; /* Adjust the gap as needed */
-}
-
 .radio-button {
     margin: 0 5px;
     accent-color: #ff6f61; /* Customize the color to match your theme */

@@ -207,6 +207,12 @@
         });
     
         function addNewRow() {
+            if (currentRow) {
+                currentRow.querySelectorAll('.wordle-box').forEach(box => {
+                    box.removeEventListener('click', cycleBoxColor);
+                });
+            }
+
             const newRow = document.createElement('div');
             newRow.className = 'wordle-row';
             for (let i = 0; i < 5; i++) {
