@@ -1,0 +1,33 @@
+.hexagon-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px; /* Adjust gap as needed */
+}
+
+.hexagon {
+    width: 55px; /* Adjust size as needed */
+    height: 60px;
+    background-color: lightgray;
+    clip-path: polygon(
+        50% 0%, 
+        100% 25%, 
+        100% 75%, 
+        50% 100%, 
+        0% 75%, 
+        0% 25%
+    );
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px; /* Increased font-size */
+    font-weight: bold;
+    user-select: none; /* Prevent text selection */
+    text-align: center;
+    line-height: 60px; /* Set line-height to match the height for vertical centering */
+}
+
+.hexagon.middle {
+    background-color: yellow;
+}
+
