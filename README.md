@@ -1,7 +1,7 @@
 # NYT Answer Key
 
 This app implements automated solvers or helpers for a variety of games in the New York Times collection: Spelling Bee, Wordle, Connections, Crossword, Sudoku, and Letter Boxed.
-To use it, visit https://nyt-answer-key.onrender.com, press a game button, and press the help button in the upper right corner to learn how to use the interface. Be aware that because the app is currently hosted on a free instance of Render, the website may take up to a minute to load.
+To use it, visit https://www.nytanswerkey.com/.
 
 
 # Games
@@ -25,7 +25,9 @@ The Wordle solver starts with a list of all valid Wordle answers and makes or su
 
 Connections is a game where players are given a board of 16 words and asked to collect them into groups of 4 that share something in common. When the player makes a guess of a group, they will be told if their guess was correct or if they grouped 3 words correctly but not all 4.
 
-The Connections solver plays in the following manner:
+The Connections helper on https://www.nytanswerkey.com/ helps you narrow down your guesses. Whenever you input a guess, the helper will eliminate answers that are no longer valid for future guesses. As you choose words for your guess, the available guesses list will update in real time, displaying your remaining valid options. If you select an invalid guess, it will display "This guess was ruled out".
+
+The Connections solver (WIP) plays in the following manner:
  1. Generate a list of all possible ways to group the 16 given words into groups of 4. 
  2. Calculate each group's median pairwise semantic similarity (MPSS). It does this by generating all possible pairs of words in the given group, calculating each pair's semantic similarity using the `SpaCy` library, and taking the median of the resulting list.
  3. Sort the possible groupings according to their MPSS.
@@ -33,7 +35,6 @@ The Connections solver plays in the following manner:
  5. Recieve feedback on the quality of the guess and eliminate now-invalid groupings accordingly.
  6. If the puzzle is not solved, return to step 4.
 
- Be aware that the Connections solver performs very poorly in human terms. Grouping words together is a very abstract task, and this particular algorithm cannot accomplish it in the allotted amount of guesses for a typical Connections game. Also note that this algorithm requires too much memory to run on a free instance of Render, so the website simply filters invalid guesses instead.
 
 ## Sudoku
 
