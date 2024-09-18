@@ -113,11 +113,7 @@ def word_has_all(word, letters):
 
 
 def word_has_only(word, letters):
-    for letter in word:
-        if letter not in letters:
-            return False
-
-    return True
+    return bitset(word).issubset(bitset(letters))
 
 
 def word_has_duplicates(word):
